@@ -1,0 +1,6 @@
+results/*.jpg
+results/*.JPG
+results/*.png
+results/*.PNG
+results/*.html
+~.DS_Store
