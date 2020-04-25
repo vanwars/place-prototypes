@@ -1,0 +1,88 @@
+@import url(
+   https://fonts.googleapis.com/css?family=Open+Sans:400italic,800italic,400,800|Amatic+SC);
+
+
+body,
+p {
+   font-family: "Open Sans", sans-serif;
+   line-height: 1.5;
+   font-size: 0.9em;
+}
+h1 {
+   font: 4em "Amatic SC", cursive;
+   margin-bottom: 10px;
+   text-align: center;
+}
+
+h2 {
+   font: 2em "Amatic SC", cursive;
+   color: #777;
+   margin-bottom: 0.5em;
+   /* display: inline; */
+}
+.card {
+    margin-bottom: 30px;
+}
+.card .add-button {
+   display: none;
+}
+.card:hover {
+   cursor: pointer;
+}
+.card:hover .add-button {
+   float: right;
+   font: 3em "Amatic SC", cursive;
+   color: #777;
+   text-decoration: none;
+   border: solid 1px #777;
+   line-height: 25px;
+   width: 30px;
+   height: 30px;
+   margin-right: -5px;
+   text-align: center;
+   border-radius: 20px;
+   display: block;
+}
+.card .metadata {
+   display: none;
+}
+
+img {
+   width: 100%;
+}
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.card > div {
+   border: solid 1px #ccc;
+   padding: 20px;
+   margin: 10px;
+   border-radius: 10px;
+}
+
+@media (max-width: 1100px) {
+    .grid {
+       grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    .grid {
+       grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .card > div {
+        border: none;
+        margin: 0px;
+    } 
+    h2 {
+        font: 2.5em "Amatic SC", cursive;
+    }
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
