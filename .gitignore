@@ -4,4 +4,5 @@ results/*.png
 results/*.PNG
 results/*.html
 password.py
+__pycache__
 ~.DS_Store
