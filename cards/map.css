@@ -1,0 +1,14 @@
+.card {
+    margin: 0;
+    padding: 0;
+}
+.card > div {
+    max-height: 200px;
+    overflow-y: auto;
+    border: none;
+    padding-right: 15px;
+    margin: 0;
+}
+#mapid { 
+    height: calc(100vh - 80px); 
+}
