@@ -3,4 +3,5 @@ results/*.JPG
 results/*.png
 results/*.PNG
 results/*.html
+password.py
 ~.DS_Store
