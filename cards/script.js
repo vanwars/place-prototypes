@@ -1,20 +1,6 @@
 let numColumns = 4;
 let mapData;
-const url =
-   "../results/data.json";
-
-const threeColumns = `
-    <section id="col1"></section>
-    <section id="col2"></section>
-    <section id="col3"></section>
-`;
-const twoColumns = `
-    <section id="col1"></section>
-    <section id="col2"></section>
-`;
-const oneColumn = `
-    <section id="col1"></section>
-`;
+const url = "../results/data.json";
 
 const generateCard = (map) => {
     let paragraphs = '';
@@ -32,7 +18,10 @@ const generateCard = (map) => {
             <img src="${map.image_source}" />
             ${paragraphs}
             <p><strong>${map.footer}</strong></p>
-            <span class="tag">${map.place}</span>
+            <span class="tag">
+                <i class="fas fa-map-marker-alt"></i>
+                ${map.place}
+            </span>
         </div>
    </div>`;
 };
@@ -41,6 +30,7 @@ const saveData = (data) => {
     mapData = data;
 }
 const showMaps = () => {
+    let i = 0;
     let cardMatrix = [[]];
     if (numColumns == 2) {
         cardMatrix = [[], []]
@@ -49,40 +39,37 @@ const showMaps = () => {
     } else if (numColumns == 4) {
         cardMatrix = [[], [], [], []]
     };
-    let i = 0;
     for (const map of mapData) {
-        if (map.image_source) {
-            const template = generateCard(map);
-            cardMatrix[i % numColumns].push(template);
-            ++i;
-        } else {
-            console.log("no image found", map) 
-        }
+        cardMatrix[i % numColumns].push(generateCard(map));
+        i++;
     }
-    console.log(cardMatrix);
+    // console.log(cardMatrix);
     document.querySelector(".grid").innerHTML = "";
     for (const column of cardMatrix) {
         const htmlColumn = `<section class="cards">${column.join('\n')}</section>`;
         document.querySelector(".grid").innerHTML += htmlColumn;
     }
+    addEventHandlers();
 };
 
 const init = () => {
-   fetch(url)
-   .then((response) => {
-      return response.json();
-   })
-   .then(saveData)
-   .then(showMaps)
-   .then(addEventHandlers);
+    fetch(url)
+        .then((response) => {
+            return response.json();
+        })
+        .then(saveData)
+        .then(showMaps)
+        .then(initMobileListeners);
+};
 
+const initMobileListeners = () => {
     const laptop = window.matchMedia("(max-width: 1100px)");
     laptop.addListener(() => {
         numColumns = 4;
         if (laptop.matches) {
             numColumns = 3;
         }
-        console.log(numColumns);
+        // console.log(numColumns);
         showMaps()
     });
    
@@ -92,7 +79,7 @@ const init = () => {
         if (tablet.matches) {
             numColumns = 2;
         }
-        console.log(numColumns);
+        // console.log(numColumns);
         showMaps()
     });
    
@@ -102,29 +89,20 @@ const init = () => {
         if (mobile.matches) {
             numColumns = 1;
         }
-        console.log(numColumns);
+        // console.log(numColumns);
         showMaps();
     });
 };
 
 const addEventHandlers = () => {
-   const buttons = document.querySelectorAll('.add-button');
-   for (const btn of buttons) {
-      btn.onclick = (ev) => { 
-         const cardElement = ev.srcElement.parentElement.parentElement; 
-         cardElement.querySelector('.metadata').style.display = 'block';
-         ev.preventDefault();
-      };
-   }
-}
-
-const updateLayout = (x) => {
-   if (x.matches) {
-      // If media query matches
-      console.log("small");
-   } else {
-      console.log("big");
-   }
+    const buttons = document.querySelectorAll('.add-button');
+    for (const btn of buttons) {
+        btn.onclick = (ev) => { 
+            const cardElement = ev.srcElement.parentElement.parentElement; 
+            cardElement.querySelector('.metadata').style.display = 'block';
+            ev.preventDefault();
+        };
+    }
 };
 
 init();
