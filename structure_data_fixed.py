@@ -35,6 +35,10 @@ start = False
 entry = {}
 for element in article.find_all(['p', 'h4', 'hr', 'figure']):
     if element.name == 'hr':
+        if start:
+            footer = entry['paragraphs'].pop()
+            entry['footer'] = footer
+            entry['place'] = ','.join(footer.split(',')[1:])
         start = True
         entry = {}
         entry['paragraphs'] = []
@@ -43,22 +47,28 @@ for element in article.find_all(['p', 'h4', 'hr', 'figure']):
         continue
     elif not start:
         continue
-    
+
     if element.name == 'p':
-        entry['paragraphs'].append(element.text)
+        if len(element.text) > 2:
+            entry['paragraphs'].append(element.text)
     elif element.name == 'h4':
+        if element.text == 'About the Author':
+            break
         entry['header'] = element.text
     elif element.name == 'figure':
         image_url = element.find('img').get('data-src')
         file_name = image_url.split('/')[-1]
         entry['image_source'] = image_url
-        try:
-            print('Downloading', image_url, '...')
-            local_path = download_image(image_url,  file_name)
-            entry['image_local'] = local_path
-            # be polite:
-            time.sleep(0.5)
-        except Exception:
-            print('Error downloading file name')
+        # try:
+        #     print('Downloading', image_url, '...')
+        #     local_path = download_image(image_url,  file_name)
+        #     entry['image_local'] = local_path
+        #     # be polite:
+        #     time.sleep(0.5)
+        # except Exception:
+        #     print('Error downloading file name')
+footer = entry['paragraphs'].pop()
+entry['footer'] = footer
+entry['place'] = ','.join(footer.split(',')[1:])
 
 save_to_file_json(article_list)

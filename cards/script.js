@@ -17,17 +17,25 @@ const oneColumn = `
 `;
 
 const generateCard = (map) => {
-   return `<div class="card">
+    let card = `<div class="card">
         <div>
             <a class="add-button" href="#">+</a>
             <h2>${map.header}</h2>
             <div class="metadata">Metadata!</div>
             <p>${map.paragraphs[0]}</p>
             <img src="${map.image_source}" />
-            <p>${map.paragraphs[1]}</p>
-            <p><strong>${map.paragraphs[2]}</strong></p>
+    `;
+    if (map.paragraphs.length > 1) {
+        // map.paragraphs.shift();
+        for (para of map.paragraphs.slice(1)) {
+            card += `<p>${para}</p>`;
+        }
+    }
+    card += `<p><strong>${map.footer}</strong></p>
+        <span class="tag">${map.place}</span>
         </div>
    </div>`;
+   return card;
 };
 
 const saveData = (data) => {
