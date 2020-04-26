@@ -66,4 +66,10 @@
         margin-left: 10px;
         margin-right: 10px;
     }
+    th {
+        position: sticky;
+        top: 109px;
+        background: white;
+        border-bottom: solid 1px #CCC !important;
+    }
 }
