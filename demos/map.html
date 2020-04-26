@@ -5,6 +5,7 @@
     <title>Map Prototype</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/cards.css">
     <link rel="stylesheet" href="./css/map.css">
     <link rel="stylesheet" href="./css/mobile.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
@@ -35,7 +36,10 @@
             </a>
         </section> 
     </header>
-    <div id="mapid"></div>
+    <main class="map">
+        <section id="card-holder"></section>
+        <div id="mapid"></div>
+    </main>
 
     <!-- Make sure you put this AFTER Leaflet's CSS -->
  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"

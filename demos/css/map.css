@@ -2,7 +2,7 @@ body {
     height: 100vh;
     overflow: hidden;
 }
-.card {
+/* .card {
     margin: 0;
     padding: 0;
     font-size: 1rem;
@@ -10,13 +10,35 @@ body {
 .leaflet-popup-content {
     width: 400px !important;
 }
-
 .card > div {
     max-height: 230px;
     overflow-y: auto;
     border: none;
     margin: 0;
-}
-#mapid { 
+} */
+main { 
     height: calc(100vh - 70px); 
+    display: grid;
+}
+#mapid {
+    height: 100%;
+}
+#card-holder {
+    display: none;
+}
+main.with-card #card-holder {
+    grid-area: left;
+    display: block;
+    overflow-y: auto;
+}
+main.with-card #card-holder .card > div {
+    border: none;
+}
+main.with-card  #mapid {
+    grid-area: main;
+}
+main.with-card { 
+    grid-template-columns: 1fr 2fr;
+    grid-template-areas: 
+        "left main";
 }

@@ -117,6 +117,8 @@ const drawMap = () => {
 };
 
 const renderData = () => {
+    document.querySelector('main').classList.remove('with-card');
+    
     if (mapMarkers.length > 0) {
         for(mapMarker of mapMarkers) {
             mymap.removeLayer(mapMarker);
@@ -128,9 +130,15 @@ const renderData = () => {
     for (const map of visibleMapData) {
         const lat = parseFloat(map.location.geometry.lat);
         const lng = parseFloat(map.location.geometry.lng);
-        const marker = L.marker([lat, lng]).addTo(mymap);
+        const marker = L.marker([lat, lng], map).addTo(mymap);
+        // marker.extend(map);
+        marker.on('click', function(e) {
+            console.log(map);
+            document.querySelector('main').classList.add('with-card');
+            document.querySelector('#card-holder').innerHTML = generateCard(map);
+        });
         mapMarkers.push(marker);
-        marker.bindPopup(generateCard(map));
+        marker.bindPopup(map.place);
     }
 }
 

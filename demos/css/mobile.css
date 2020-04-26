@@ -14,6 +14,9 @@
     .search > div {
         width: 100%;
     }
+    main.with-card { 
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 @media (max-width: 700px) {
@@ -59,9 +62,6 @@
         padding-top: 5px;
     }
 
-    #mapid { 
-        height: calc(100vh - 110px); 
-    }
     main {
         margin-left: 10px;
         margin-right: 10px;
@@ -71,5 +71,17 @@
         top: 109px;
         background: white;
         border-bottom: solid 1px #CCC !important;
+    }
+
+    main.map, main.with-card {
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+    main.with-card { 
+        grid-template-columns: auto;
+        grid-template-rows:  auto 140px;
+        grid-template-areas:
+            "main"
+            "left";
     }
 }
