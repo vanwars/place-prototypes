@@ -66,7 +66,7 @@ const generateCard = (map) => {
 const saveData = (data) => {
     mapData = data;
 }
-const showMaps = () => {
+const renderData = () => {
     let i = 0;
     let cardMatrix = [[]];
     if (numColumns == 2) {
@@ -77,8 +77,10 @@ const showMaps = () => {
         cardMatrix = [[], [], [], []]
     };
     for (const map of mapData) {
-        cardMatrix[i % numColumns].push(generateCard(map));
-        i++;
+        if (!map.hide) {
+            cardMatrix[i % numColumns].push(generateCard(map));
+            i++;
+        }
     }
     // console.log(cardMatrix);
     document.querySelector(".grid").innerHTML = "";
@@ -95,7 +97,7 @@ const init = () => {
             return response.json();
         })
         .then(saveData)
-        .then(showMaps)
+        .then(renderData)
         .then(initMobileListeners);
 };
 
@@ -107,7 +109,7 @@ const initMobileListeners = () => {
     //         numColumns = 3;
     //     }
     //     // console.log(numColumns);
-    //     showMaps()
+    //     renderData()
     // });
    
     const tablet = window.matchMedia("(max-width: 1000px)");
@@ -117,7 +119,7 @@ const initMobileListeners = () => {
             numColumns = 2;
         }
         // console.log(numColumns);
-        showMaps()
+        renderData()
     });
    
     const mobile = window.matchMedia("(max-width: 700px)");
@@ -127,7 +129,7 @@ const initMobileListeners = () => {
             numColumns = 1;
         }
         // console.log(numColumns);
-        showMaps();
+        renderData();
     });
 };
 

@@ -189,6 +189,10 @@ input#search-bar:focus:-ms-placeholder {
     margin-left: -65px;
 }
 
+.hide {
+    display: none;
+}
+
 
 
 

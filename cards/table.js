@@ -40,10 +40,12 @@ const generateRow = (map) => {
     return `<tr><td>${data.join('</td><td>')}</td></tr>`
 };
 
-const drawTable = () => {
+const renderData = () => {
     const rows = [];
     for (const map of mapData) {
-        rows.push(generateRow(map));
+        if (!map.hide) {
+            rows.push(generateRow(map));
+        }
     }
     const headerRow = `
         <tr>
@@ -75,7 +77,7 @@ const init = () => {
             return response.json();
         })
         .then(saveData)
-        .then(drawTable);
+        .then(renderData);
 };
 
 init();
