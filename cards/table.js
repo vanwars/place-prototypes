@@ -9,6 +9,7 @@ const saveData = (data) => {
 
 const generateRow = (map) => {
     const data = []
+    data.push(map.id);
     data.push(`<img src="${map.image_source}" />`);
     data.push(map.header);
     if (map.paragraphs.length > 0) {
@@ -21,8 +22,8 @@ const generateRow = (map) => {
         data.push(map.location.state || '');
         data.push(map.location.country || '');
         if (map.location.geometry) {
-            data.push(map.location.geometry.lat || '');
-            data.push(map.location.geometry.lng || '');
+            data.push(parseFloat(map.location.geometry.lat).toFixed(3));
+            data.push(parseFloat(map.location.geometry.lng).toFixed(3));
         } else {
             data.push('');
             data.push('');
@@ -101,6 +102,7 @@ const drawTable = () => {
     }
     const headerRow = `
         <tr>
+            <th>ID</th>
             <th>Image</th>
             <th>Title</th>
             <th>Description</th>

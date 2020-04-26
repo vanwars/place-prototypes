@@ -71,8 +71,9 @@ for element in article.find_all(['p', 'h4', 'hr', 'figure']):
         start = True
         entry = {}
         entry['paragraphs'] = []
+        entry['id'] = counter
+        counter += 1
         article_list.append(entry)
-        counter = 1
         continue
     elif not start:
         continue
