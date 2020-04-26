@@ -1,5 +1,7 @@
 let numColumns = 4;
 let mapData;
+let mapMarkers = [];
+let mymap;
 const url = "../results/data.json";
 
 
@@ -99,7 +101,7 @@ const drawMap = () => {
 			maxZoom: 20,
 			ext: 'png'
 		});
-        const mymap = L.map('mapid', {
+        mymap = L.map('mapid', {
             layers: [watercolorMap]
         }).setView([51.505, -0.09], 2);
 
@@ -112,17 +114,25 @@ const drawMap = () => {
 	  
 		 //Add baseLayers to map as control layers
 		 L.control.layers(baseLayers).addTo(mymap);
-
-    
-    for (const map of mapData) {
-        if(map.location && map.location.geometry) {
-            const lat = parseFloat(map.location.geometry.lat);
-            const lng = parseFloat(map.location.geometry.lng);
-            const marker = L.marker([lat, lng]).addTo(mymap);
-            marker.bindPopup(generateCard(map));
-        }
-    }
 };
+
+const renderData = () => {
+    if (mapMarkers.length > 0) {
+        for(mapMarker of mapMarkers) {
+            mymap.removeLayer(mapMarker);
+        }
+        mapMarkers = [];
+    }
+    const visibleMapData = mapData.filter(map => !map.hide && map.location && map.location.geometry);
+    
+    for (const map of visibleMapData) {
+        const lat = parseFloat(map.location.geometry.lat);
+        const lng = parseFloat(map.location.geometry.lng);
+        const marker = L.marker([lat, lng]).addTo(mymap);
+        mapMarkers.push(marker);
+        marker.bindPopup(generateCard(map));
+    }
+}
 
 const init = () => {
     fetch(url)
@@ -130,7 +140,8 @@ const init = () => {
             return response.json();
         })
         .then(saveData)
-        .then(drawMap);
+        .then(drawMap)
+        .then(renderData)
 };
 
 init();

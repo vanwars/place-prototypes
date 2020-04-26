@@ -7,9 +7,10 @@ const saveData = (data) => {
     mapData = data;
 };
 
-const showCode = () => {
+const renderData = () => {
+    const visibleMapData = mapData.filter(map => !map.hide);
     document.querySelector('pre').innerHTML = `
-        ${JSON.stringify(mapData, null, 4)}
+        ${JSON.stringify(visibleMapData, null, 4)}
     `;
 };
 
@@ -19,7 +20,7 @@ const init = () => {
             return response.json();
         })
         .then(saveData)
-        .then(showCode);
+        .then(renderData);
 };
 
 init();
