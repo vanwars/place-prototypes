@@ -5,19 +5,30 @@
 html, body {
     margin: 0;
 }
+body {
+    padding-top: 80px;
+}
 body,
 p {
    font-family: "Open Sans", sans-serif;
    line-height: 1.5;
    font-size: 0.9em;
 }
-h1 {
+header {
+    position: fixed;
+    background-color: white;
+    width: 100vw;
+    top: 0;
+    height: 80px;
+    display: grid;
+    grid-template-columns: auto 120px;
+}
+header h1 {
    font: 4em "Amatic SC", cursive;
    margin-bottom: 10px;
    text-align: center;
    margin: 0px;
-   height: 80px;
-   padding-left: 185px;
+   padding-left: 120px;
 }
 
 h2 {
@@ -59,6 +70,8 @@ img {
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .tag {
@@ -88,17 +101,22 @@ table th {
 }
 .menu-item {
     font-size: 1.1rem;
-    color: #555;
+    color: #CCC;
     float: right;
     line-height: 32px;
-    margin-right: 10px;
     margin-left: 10px;
     font-family: "Open Sans", sans-serif;
     text-decoration: none;
     padding-top: 25px;
 }
-.menu-item.active {
-    border-bottom: solid 3px #7B8CDE;
+.menu-item:first-child {
+    margin-right: 10px;
+}
+.menu-item.active i {
+    background: #7B8CDE;
+    color: white;
+    padding: 6px;
+    border-radius: 5px;
 }
 
 .card > div {
@@ -129,6 +147,9 @@ table th {
         font: 2.5em "Amatic SC", cursive;
     }
     .grid {
+        grid-template-columns: 1fr;
+    }
+    header {
         grid-template-columns: 1fr;
     }
     h1 {

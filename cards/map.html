@@ -11,11 +11,20 @@
         crossorigin=""/>
 </head>
 <body style="padding-bottom: 50px;">
-    <h1>
-        Covid-19 Maps
-        <a class="menu-item active" href="map.html">Map View</a>
-        <a class="menu-item" href="index.html">Card View</a>
-    </h1>
+    <header>
+        <h1>Covid-19 Maps</h1>
+        <section>
+            <a class="menu-item" href="index.html">
+                <i class="fas fa-th-large"></i>
+            </a>
+            <a class="menu-item" href="table.html">
+                <i class="fas fa-table"></i>
+            </a>
+            <a class="menu-item active" href="map.html">
+                <i class="fas fa-map"></i>
+            </a>
+        </section> 
+    </header>
     <div id="mapid"></div>
 
     <!-- Make sure you put this AFTER Leaflet's CSS -->
