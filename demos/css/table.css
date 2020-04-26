@@ -2,7 +2,9 @@ main {
     margin-left: 30px;
     margin-right: 30px;
 }
-
+table {
+    position: relative;
+}
 table img {
     width: 200px;
 }
@@ -12,4 +14,10 @@ table th {
 table th, table td {
     vertical-align: top;
     padding: 10px;
+}
+th {
+    position: sticky;
+    top: 69px;
+    background: white;
+    border-bottom: solid 1px #CCC !important;
 }
