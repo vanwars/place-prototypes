@@ -69,11 +69,13 @@ for element in article.find_all(['p', 'h4', 'hr', 'figure']):
             entry['place'] = ','.join(footer.split(',')[1:])
             entry['location'] = get_location(entry['place'])
         start = True
-        entry = {}
-        entry['paragraphs'] = []
-        entry['id'] = counter
-        counter += 1
+        entry = {
+            'id': counter,
+            'header': None,
+            'paragraphs': []
+        }
         article_list.append(entry)
+        counter += 1
         continue
     elif not start:
         continue
