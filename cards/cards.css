@@ -21,14 +21,14 @@ header {
     top: 0;
     height: 80px;
     display: grid;
-    grid-template-columns: auto 120px;
+    grid-template-columns: auto 160px;
 }
 header h1 {
    font: 4em "Amatic SC", cursive;
    margin-bottom: 10px;
    text-align: center;
    margin: 0px;
-   padding-left: 120px;
+   padding-left: 160px;
 }
 
 h2 {
@@ -70,8 +70,8 @@ img {
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    margin-left: 5px;
-    margin-right: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .tag {
@@ -110,7 +110,7 @@ table th {
     padding-top: 25px;
 }
 .menu-item:first-child {
-    margin-right: 10px;
+    margin-right: 30px;
 }
 .menu-item.active i {
     background: #7B8CDE;
@@ -155,10 +155,17 @@ table th {
         text-align: left;
         margin: 0px;
         padding: 0px;
-        padding-left: 10px;
+        padding-left: 30px;
         margin-top: 12px;
     }
     h2 {
         margin-top: 0;
+    }
+    .menu-item:first-child {
+        margin-right: 20px;
+    }
+    .grid {
+        margin-left: 5px;
+        margin-right: 5px;
     }
 }

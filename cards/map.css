@@ -12,3 +12,7 @@
 #mapid { 
     height: calc(100vh - 80px); 
 }
+
+/* .menu-item:first-child {
+    margin-right: 10px;
+} */
