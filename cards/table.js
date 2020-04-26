@@ -36,63 +36,8 @@ const generateRow = (map) => {
         data.push('');
     }
     data.push(map.footer);
+    data.push(map.tags.join(', '));
     return `<tr><td>${data.join('</td><td>')}</td></tr>`
-
-
-//     let placeInfo = '';
-//     let geom = '';
-//     if (map.location) {
-//         let locale = '';
-//         if (map.location.city) {
-//             locale += map.location.city + ', ';
-//         }
-//         if (map.location.state) {
-//             locale += map.location.state + ', ';
-//         }
-//         if (map.location.country) {
-//             locale += map.location.country;
-//         }
-//         if (map.location.geometry && map.location.geometry.lng && map.location.geometry.lat) {
-//             let lat = parseFloat(map.location.geometry.lat);
-//             let lng = parseFloat( map.location.geometry.lng)
-//             geom = '(' + lat.toFixed(3) + ', ' + lng.toFixed(3) + ')';
-//         }
-//         placeInfo = `
-//             <table>
-//                 <tr>
-//                     <th>Original:</th>
-//                     <td>${map.place}</td>
-//                 </tr>
-//                 <tr>
-//                     <th>Geocoded:</th>
-//                     <td>${locale}</td>
-//                 </tr>
-//                 <tr>
-//                     <th>Coordinates</th>
-//                     <td>
-//                         <i class="fas fa-map-marker-alt"></i> 
-//                         ${geom}
-//                     </td>
-//                 </tr>
-//             </table>
-//         `;
-//     }
-// //     return `<div class="card">
-// //         <div>
-// //             <h2>${map.header}</h2>
-// //             <div class="metadata">Metadata!</div>
-// //             <p>${map.paragraphs[0]}</p>
-// //             <img src="${map.image_source}" />
-// //             ${paragraphs}
-// //             <p><strong>${map.footer}</strong></p>
-// //             ${placeInfo}
-// //         </div>
-// //    </div>`;
-//    return `<tr>
-//         <td>${map.header}</td>
-//         <td>${map.paragraphs[0].substring(0, 200) + '...'}</td>
-//     </tr>
-//     `;
 };
 
 const drawTable = () => {
@@ -112,6 +57,7 @@ const drawTable = () => {
             <th>Lat</th>
             <th>Lng</th>
             <th>Author</th>
+            <th>Tags</th>
         </tr>
     `
     const tbody = rows.join('\n');

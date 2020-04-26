@@ -4,9 +4,27 @@ from bs4 import BeautifulSoup
 import time
 import json
 import ssl
+import random
+
+tags = [
+    'more communication', 'solidarity', 
+    'distrust', 'fear', 'nature', 'quiet', 'homeschool',
+    'family', 'collaboration', 'understanding', 'getting to know the neighbors',
+    'compassion', 'strangers', 'necessities', 'walks', 'kids', 'birds',
+    'wild animals', 'friends', 'community', 'neighborhood', 'biking', 'siblings',
+    'hectic', 'shopping', 'running', 'gardening', 'more aware'
+]
 context = ssl._create_unverified_context()
 
+
 url = 'https://www.citylab.com/life/2020/04/neighborhood-maps-coronavirus-lockdown-stay-at-home-art/610018/?utm_campaign=socialflow-organic&utm_source=twitter&utm_medium=social&utm_content=citylab'
+
+
+def get_tags():
+    my_tags = []
+    for i in range(0, random.randint(1, 4)):
+        my_tags.append(random.choice(tags))
+    return my_tags
 
 def save_to_file_json(data, file_name='data.json', subdirectory='results'):
     f = open(subdirectory + '/' + file_name, 'w')
@@ -72,7 +90,8 @@ for element in article.find_all(['p', 'h4', 'hr', 'figure']):
         entry = {
             'id': counter,
             'header': None,
-            'paragraphs': []
+            'paragraphs': [],
+            'tags': get_tags()
         }
         article_list.append(entry)
         counter += 1

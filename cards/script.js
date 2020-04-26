@@ -1,4 +1,4 @@
-let numColumns = 4;
+let numColumns = 3;
 let mapData;
 const url = "../results/data.json";
 
@@ -27,6 +27,7 @@ const generateCard = (map) => {
             let lng = parseFloat( map.location.geometry.lng)
             geom = '(' + lat.toFixed(3) + ', ' + lng.toFixed(3) + ')';
         }
+        const tags = ``
         placeInfo = `
             <table>
                 <tr>
@@ -57,6 +58,7 @@ const generateCard = (map) => {
             ${paragraphs}
             <p><strong>${map.footer}</strong></p>
             ${placeInfo}
+            <span class="tag">${map.tags.join('</span><span class="tag">')}</span>
         </div>
    </div>`;
 };
@@ -98,17 +100,17 @@ const init = () => {
 };
 
 const initMobileListeners = () => {
-    const laptop = window.matchMedia("(max-width: 1100px)");
-    laptop.addListener(() => {
-        numColumns = 4;
-        if (laptop.matches) {
-            numColumns = 3;
-        }
-        // console.log(numColumns);
-        showMaps()
-    });
+    // const laptop = window.matchMedia("(max-width: 1100px)");
+    // laptop.addListener(() => {
+    //     numColumns = 4;
+    //     if (laptop.matches) {
+    //         numColumns = 3;
+    //     }
+    //     // console.log(numColumns);
+    //     showMaps()
+    // });
    
-    const tablet = window.matchMedia("(max-width: 900px)");
+    const tablet = window.matchMedia("(max-width: 1000px)");
     tablet.addListener(() => {
         numColumns = 3;
         if (tablet.matches) {

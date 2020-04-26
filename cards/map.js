@@ -61,6 +61,7 @@ const generateCard = (map) => {
             ${paragraphs}
             <p><strong>${map.footer}</strong></p>
             ${placeInfo}
+            <span class="tag">${map.tags.join('</span><span class="tag">')}</span>
         </div>
    </div>`;
 };

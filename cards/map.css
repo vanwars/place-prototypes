@@ -1,18 +1,22 @@
+body {
+    height: 100vh;
+    overflow: hidden;
+}
 .card {
     margin: 0;
     padding: 0;
+    font-size: 1rem;
 }
+.leaflet-popup-content {
+    width: 400px !important;
+}
+
 .card > div {
-    max-height: 200px;
+    max-height: 230px;
     overflow-y: auto;
     border: none;
-    padding-right: 15px;
     margin: 0;
 }
 #mapid { 
     height: calc(100vh - 80px); 
 }
-
-/* .menu-item:first-child {
-    margin-right: 10px;
-} */
