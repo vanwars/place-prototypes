@@ -149,14 +149,14 @@ table th {
     .grid {
         grid-template-columns: 1fr;
     }
-    header {
-        grid-template-columns: 1fr;
-    }
-    h1 {
-        padding-left: 0;
-    }
-    .menu-item {
-        display: none;
+
+    header h1 {
+        font: 3em "Amatic SC", cursive;
+        text-align: left;
+        margin: 0px;
+        padding: 0px;
+        padding-left: 10px;
+        margin-top: 12px;
     }
     h2 {
         margin-top: 0;

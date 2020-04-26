@@ -1,0 +1,15 @@
+main {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+table img {
+    width: 200px;
+}
+table th {
+    text-align: center;
+}
+table th, table td {
+    vertical-align: top;
+    padding: 10px;
+}
