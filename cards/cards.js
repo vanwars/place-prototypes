@@ -76,11 +76,21 @@ const renderData = () => {
     } else if (numColumns == 4) {
         cardMatrix = [[], [], [], []]
     };
-    for (const map of mapData) {
-        if (!map.hide) {
-            cardMatrix[i % numColumns].push(generateCard(map));
-            i++;
-        }
+    const visibleMapData = mapData.filter(map => !map.hide);
+    if (visibleMapData.length === 0) {
+        document.querySelector('main').innerHTML = `
+            <p class="no-matches">No matches for 
+                "${document.querySelector("#search-bar").value}</strong>"
+            </p>
+        `;
+        document.querySelector('.grid').innerHTML = "";
+        return;
+    } else {
+        document.querySelector('main').innerHTML = "";
+    }
+    for (const map of visibleMapData) {
+        cardMatrix[i % numColumns].push(generateCard(map));
+        i++;
     }
     // console.log(cardMatrix);
     document.querySelector(".grid").innerHTML = "";

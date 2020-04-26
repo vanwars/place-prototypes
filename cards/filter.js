@@ -1,7 +1,7 @@
 const applyFilter = () => {
     const searchTerm = document.querySelector("#search-bar").value;
     for (const map of mapData) {
-        let text = map.paragraphs.join(' ') +  map.header + map.footer;
+        let text = map.paragraphs.join(' ') + map.header + map.footer + map.tags.join(' ');
         if (map.location) {
             text +=  map.location.county + ' ' + map.location.country + ' ' +
                      map.location.state + ' ' + map.location.city

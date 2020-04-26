@@ -42,10 +42,17 @@ const generateRow = (map) => {
 
 const renderData = () => {
     const rows = [];
-    for (const map of mapData) {
-        if (!map.hide) {
-            rows.push(generateRow(map));
-        }
+    const visibleMapData = mapData.filter(map => !map.hide);
+    for (const map of visibleMapData) {
+        rows.push(generateRow(map));
+    }
+    if (visibleMapData.length === 0) {
+        document.querySelector('main').innerHTML = `
+            <p class="no-matches">No matches for 
+                "${document.querySelector("#search-bar").value}</strong>"
+            </p>
+        `;
+        return;
     }
     const headerRow = `
         <tr>
