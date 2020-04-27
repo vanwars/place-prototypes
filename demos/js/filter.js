@@ -19,4 +19,39 @@ const checkMatch = (text, searchTerm) => {
     return false;
 };
 
+const appendHTMLtoDOM = (elem, htmlString) => {
+    const div = document.createElement('div');
+    div.innerHTML = htmlString;
+    while (div.children.length > 0) {
+        elem.appendChild(div.children[0]);
+    }
+    return div;
+};
+
+document.querySelector('.filter-button').onclick = () => {
+    const searchBar = document.querySelector('#search-bar');
+    const xPos = searchBar.offsetLeft;
+    const yPos = searchBar.offsetTop + searchBar.clientHeight;
+    const w = searchBar.clientWidth;
+
+    filterPanel = document.querySelector('.filter-panel');
+    if (!filterPanel) {
+        appendHTMLtoDOM(
+            document.querySelector('body'),
+            `<div style="top: ${yPos}px; left: ${xPos}px; width: ${w}px;" class="filter-panel">
+                <p>Filter Panel coming soon!</p>
+            </div>`
+        );
+        filterPanel = document.querySelector('.filter-panel');
+        return;
+    }
+    if (filterPanel.style.display !== 'none') {
+        filterPanel.style.display = 'none';
+    } else {
+        filterPanel.style.display = 'block';
+        filterPanel.style.top = yPos + 'px';
+        filterPanel.style.left = xPos + 'px';
+        filterPanel.style.width = w + 'px';
+    }
+}
 document.querySelector('#search-bar').onkeyup = applyFilter;
