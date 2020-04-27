@@ -9,10 +9,10 @@
        grid-template-columns: 1fr 1fr;
     }
     header {
-        grid-template-columns: 200px auto 140px;
+        grid-template-columns: 200px auto 170px;
     }
     .search > div {
-        width: 100%;
+        width: 80%;
     }
     main.with-card { 
         grid-template-columns: 1fr 1fr;

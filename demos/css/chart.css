@@ -1,0 +1,17 @@
+main {
+    padding-top: 10px;
+    /* padding-left: 10vw;
+    padding-right: 10vw; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+/* table {
+    width: auto;
+} */
+
+table th {
+    text-align: left;
+}
