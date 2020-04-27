@@ -22,8 +22,8 @@ url = 'https://www.citylab.com/life/2020/04/neighborhood-maps-coronavirus-lockdo
 
 def get_tags():
     my_tags = []
-    for i in range(0, random.randint(1, 4)):
-        my_tags.append(random.choice(tags))
+    # for i in range(0, random.randint(1, 4)):
+    #     my_tags.append(random.choice(tags))
     return my_tags
 
 def save_to_file_json(data, file_name='data.json', subdirectory='results'):

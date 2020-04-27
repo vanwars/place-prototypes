@@ -45,6 +45,7 @@ const generateCard = (map) => {
     }
     return `<div class="card">
         <div class="desktop">
+            <a class="less" href="#">x</a>
             <h2>${map.header}</h2>
             <p>${map.paragraphs[0]}</p>
             <img src="${map.image_source}" />
@@ -55,10 +56,7 @@ const generateCard = (map) => {
         </div>
         <div class="mobile">
             <h2>${map.header}</h2>
-            <p>
-                ${map.paragraphs[0].substring(0, 200)}...
-                <a class="more" href="#">more</a>
-            </p>
+            <a class="more" href="#"><i class="fas fa-expand"></i></a>
         </div>
    </div>`;
 };

@@ -1,7 +1,7 @@
 let numColumns = 4;
 let mapData;
 let mapMarkers = [];
-let mymap;
+let map;
 const url = "../results/data.json";
 
 const saveData = (data) => {
@@ -17,7 +17,7 @@ const drawMap = () => {
 			maxZoom: 20,
 			ext: 'png'
 		});
-        mymap = L.map('mapid', {
+        map = L.map('mapid', {
             layers: [watercolorMap],
             trackResize: true,
             minZoom: 2,
@@ -27,30 +27,32 @@ const drawMap = () => {
 
 const renderData = () => {
     document.querySelector('main').classList.remove('with-card');
+    map.invalidateSize();
     
     if (mapMarkers.length > 0) {
         for(mapMarker of mapMarkers) {
-            mymap.removeLayer(mapMarker);
+            map.removeLayer(mapMarker);
         }
         mapMarkers = [];
     }
-    const visibleMapData = mapData.filter(map => !map.hide && map.location && map.location.geometry);
+    const visibleMapData = mapData.filter(item => !item.hide && item.location && item.location.geometry);
     
-    for (const map of visibleMapData) {
-        const lat = parseFloat(map.location.geometry.lat);
-        const lng = parseFloat(map.location.geometry.lng);
-        const marker = L.marker([lat, lng], map).addTo(mymap);
+    for (const item of visibleMapData) {
+        const lat = parseFloat(item.location.geometry.lat);
+        const lng = parseFloat(item.location.geometry.lng);
+        const marker = L.marker([lat, lng], item).addTo(map);
         marker.on('click', function(e) {
             setTimeout(() => { 
-                mymap.invalidateSize()
-                mymap.setView(e.latlng); 
+                map.invalidateSize()
+                map.setView(e.latlng); 
             }, 10);
             document.querySelector('main').classList.add('with-card');
-            document.querySelector('#card-holder').innerHTML = generateCard(map);
+            document.querySelector('#card-holder').innerHTML = generateCard(item);
             document.querySelector('.more').onclick = toggleFullScreen;
+            document.querySelector('.less').onclick = toggleFullScreen;
         });
         mapMarkers.push(marker);
-        marker.bindPopup(map.place);
+        marker.bindPopup(item.place);
     }
 }
 
@@ -65,7 +67,8 @@ const init = () => {
 };
 
 const toggleFullScreen = () => {
-    document.querySelector('#card-holder').classList.toggle('fullscreen')
+    document.querySelector('#card-holder').classList.toggle('fullscreen');
+    map.invalidateSize();
 }
 
 init();

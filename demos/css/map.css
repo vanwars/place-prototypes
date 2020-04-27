@@ -12,6 +12,23 @@ main {
 }
 #card-holder {
     display: none;
+    transition-property: top, bottom;
+    transition-duration: .3s, .3s;
+}
+.less {
+    display: none;
+}
+.more {
+    bottom: 14px;
+    background: white;
+    position: absolute;
+    right: 7px;
+    text-decoration: none;
+    color: #444;
+    font-size: 1.5rem;
+}
+.more:hover {
+    color: #7B8CDE;
 }
 main.with-card #card-holder {
     grid-area: left;
@@ -39,7 +56,26 @@ main.with-card #card-holder.fullscreen {
     z-index: 10000;
     overflow-y: auto;
     background: white;
+    padding-top: 30px;
 }
 main.with-card #card-holder.fullscreen .mobile {
     display: none;
+}
+main.with-card #card-holder.fullscreen .less {
+    display: block;
+    position: fixed;
+    right: -1px;
+    top: -1px;
+    background: white;
+    height: 40px;
+    width: 40px;
+    line-height: 35px;
+    text-align: center;
+    border: solid 1px #CCC;
+    text-decoration: none;
+    color: #444;
+    font-weight: 600;
+}
+main.with-card #card-holder.fullscreen .less:hover {
+    background: #F0F0F0;
 }
