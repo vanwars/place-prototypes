@@ -135,6 +135,9 @@ input#search-bar:focus:-ms-placeholder {
 .hide {
     display: none;
 }
+.less {
+    display: none;
+}
 .no-matches {
     font-size: 1.5rem;
     display: flex;

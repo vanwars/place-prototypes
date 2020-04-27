@@ -15,9 +15,6 @@ main {
     transition-property: top, bottom;
     transition-duration: .3s, .3s;
 }
-.less {
-    display: none;
-}
 .more {
     bottom: 14px;
     background: white;
