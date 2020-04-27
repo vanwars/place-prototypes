@@ -43,6 +43,9 @@ header h1 {
     justify-content: flex-start;
     margin: 0px;
 }
+.mobile {
+    display: none;
+}
 .menu {
     grid-area: right;
     justify-content: flex-end;

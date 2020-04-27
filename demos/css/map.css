@@ -2,20 +2,7 @@ body {
     height: 100vh;
     overflow: hidden;
 }
-/* .card {
-    margin: 0;
-    padding: 0;
-    font-size: 1rem;
-}
-.leaflet-popup-content {
-    width: 400px !important;
-}
-.card > div {
-    max-height: 230px;
-    overflow-y: auto;
-    border: none;
-    margin: 0;
-} */
+
 main { 
     height: calc(100vh - 70px); 
     display: grid;
@@ -38,7 +25,21 @@ main.with-card  #mapid {
     grid-area: main;
 }
 main.with-card { 
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 7fr 10fr;
     grid-template-areas: 
         "left main";
+}
+
+main.with-card #card-holder.fullscreen {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 10000;
+    overflow-y: auto;
+    background: white;
+}
+main.with-card #card-holder.fullscreen .mobile {
+    display: none;
 }

@@ -1,7 +1,5 @@
-let numColumns = 4;
 let mapData;
 const url = "../results/data.json";
-
 
 const saveData = (data) => {
     mapData = data;

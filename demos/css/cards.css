@@ -11,6 +11,9 @@ h2 {
    margin-bottom: 0.5em;
    /* display: inline; */
 }
+.card .snippet {
+    display: none;
+}
 .card {
     margin-bottom: 30px;
 }

@@ -79,9 +79,39 @@
     }
     main.with-card { 
         grid-template-columns: auto;
-        grid-template-rows:  auto 140px;
+        grid-template-rows:  auto 164px;
         grid-template-areas:
             "main"
             "left";
     }
+    main.with-card .card {
+        overflow: hidden;
+    }
+    main.with-card .card > .desktop {
+        display: none;
+    }
+    main.with-card .fullscreen .card > .desktop {
+        display: block;
+    }
+    main.with-card .fullscreen .card > div .mobile {
+        display: none;
+    }
+    main.with-card .card > .mobile {
+        display: block;
+    }
+    main.with-card .card > .mobile h2 {
+        text-align: center;
+        height: 40px;
+        padding: 0px 40px 0px 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    main.with-card #card-holder {
+        overflow-y: hidden;
+    }
+    /* main.with-card .card .snippet {
+        padding: 0px 10px 0px 10px;
+        display: block;
+    } */
 }
