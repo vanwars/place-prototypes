@@ -141,7 +141,7 @@ const getText = (groupBy, list, attribute) => {
         return b[1].length - a[1].length;
     });
     for (let i = 0; i < sortedList.length; i++) {
-        let html = '';
+        let html = '<ul class="wrapper">';
         let counter = 0;
         // get unique values:
         const uniqueList = sortedList[i][1].filter((value, index, self) => {
@@ -150,10 +150,10 @@ const getText = (groupBy, list, attribute) => {
         uniqueList.sort();
         for (const text of uniqueList) {
             const delay = counter.toFixed(2) + 's;';
-            html += `<p style="animation-delay: ${delay}">${text}</p>`;
+            html += `<li style="animation-delay: ${delay}">${text}</li>`;
             counter += 0.05;
         }
-        sortedList[i][1] = html;
+        sortedList[i][1] = html + '</ul>';
     }
     return sortedList;
 };
@@ -185,12 +185,12 @@ const renderData = () => {
     //let data;
     const columns = [
         { name: 'count', type: 'count', title: 'Count' }, 
-        { name: 'image_source', type: 'image', width: 600, title: 'Map Image' }, 
-        { name: 'id', type: 'int', title: 'ID' }, 
-        { name: 'location.country', type: 'text', title: 'Country', width: 300 }, 
-        { name: 'location.state', type: 'text', title: 'State', width: 300 }, 
-        { name: 'location.city', type: 'text', title: 'City', width: 300 }, 
-        { name: 'author', type: 'text', width: 300, title: 'Author'} //,
+        { name: 'image_source', type: 'image', width: 450, title: 'Map Image' }, 
+        { name: 'id', type: 'int', title: 'ID', width: 200 }, 
+        { name: 'location.country', type: 'text', title: 'Country', width: 340 }, 
+        { name: 'location.state', type: 'text', title: 'State', width: 340 }, 
+        { name: 'location.city', type: 'text', title: 'City', width: 340 }, 
+        { name: 'author', type: 'text', width: 340, title: 'Author'} //,
         //{ name: 'header', type: 'text', width: 700, title: 'Map Title' }
     ]
     for (column of columns) {
