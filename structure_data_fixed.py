@@ -83,8 +83,10 @@ for element in article.find_all(['p', 'h4', 'hr', 'figure']):
     if element.name == 'hr':
         if start:
             footer = entry['paragraphs'].pop()
+            tokens = footer.split(',')
             entry['footer'] = footer
-            entry['place'] = ','.join(footer.split(',')[1:])
+            entry['author'] = tokens[0].replace('—', '')
+            entry['place'] = ','.join(tokens[1:])
             entry['location'] = get_location(entry['place'])
         start = True
         entry = {
@@ -120,7 +122,9 @@ for element in article.find_all(['p', 'h4', 'hr', 'figure']):
         #     print('Error downloading file name')
 footer = entry['paragraphs'].pop()
 entry['footer'] = footer
-entry['place'] = ','.join(footer.split(',')[1:])
+tokens = footer.split(',')
+entry['author'] = tokens[0].replace('—', '')
+entry['place'] = ','.join(tokens[1:])
 entry['location'] = get_location(entry['place'])
 
 save_to_file_json(article_list)
