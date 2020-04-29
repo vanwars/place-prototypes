@@ -116,7 +116,7 @@ const getImages = (groupBy, list) => {
     });
     for (let i = 0; i < sortedList.length; i++) {
         let html = '';
-        let counter = 1;
+        let counter = 0.5;
         for (const url of sortedList[i][1]) {
             const delay = counter.toFixed(2) + 's;';
             html += `<img style="animation-delay: ${delay}" src="${url}" />`;
@@ -142,7 +142,7 @@ const getText = (groupBy, list, attribute) => {
     });
     for (let i = 0; i < sortedList.length; i++) {
         let html = '<ul class="wrapper">';
-        let counter = 0;
+        let counter = 0.5;
         // get unique values:
         const uniqueList = sortedList[i][1].filter((value, index, self) => {
             return self.indexOf(value) === index;
@@ -171,7 +171,15 @@ const getNums = (groupBy, list, attribute) => {
     const sortedList = sortDesc(listsByGrouping);
     for (let i = 0; i < sortedList.length; i++) {
         sortedList[i][1].sort(compareNumbers);
-        sortedList[i][1] = sortedList[i][1].join(', ')
+        let html = '<ul class="wrapper numbers">';
+        let counter = 0.5;
+        for (const text of sortedList[i][1]) {
+            const delay = counter.toFixed(2) + 's;';
+            html += `<li style="animation-delay: ${delay}">${text}</li>`;
+            counter += 0.05;
+        }
+        html += '</ul>';
+        sortedList[i][1] = html;
     }
     return sortedList;
 };

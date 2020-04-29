@@ -6,25 +6,68 @@ import json
 import ssl
 import random
 
-tags = [
-    'more communication', 'solidarity', 
-    'distrust', 'fear', 'nature', 'quiet', 'homeschool',
-    'family', 'collaboration', 'understanding', 'getting to know the neighbors',
-    'compassion', 'strangers', 'necessities', 'walks', 'kids', 'birds',
-    'wild animals', 'friends', 'community', 'neighborhood', 'biking', 'siblings',
-    'hectic', 'shopping', 'running', 'gardening', 'more aware'
-]
+do_downloads = False
+
+tags = {
+    'detail': 'details', 
+    'nature': 'nature',
+    'bird': 'bird', 
+    'cat': 'pets',
+    'dog': 'pets',
+    'animal': 'animals',
+    'flower': 'flowers',
+    'beer': '', 
+    'park': '', 
+    'confine': 'confined', 
+    'home': '', 
+    'neighbor': '', 
+    'stranger': '', 
+    'street': '', 
+    'path': '', 
+    'walk': '', 
+    'bike': '', 
+    'fear': '', 
+    'garden': 'gardening', 
+    'food': '', 
+    'school': '', 
+    'kid': 'kids', 
+    'sound': '',  
+    'squawking': 'sound',
+    'lilac': 'flowers',
+    'computer': '', 
+    'friend': 'friends', 
+    'essential': 'essentials', 
+    'connect': 'connection', 
+    'online': '', 
+    'work': '', 
+    ' tree': 'trees', 
+    'safe': 'safety',  
+    'butterflies': 'animals', 
+    'lorikeets': 'birds', 
+    'transit': '', 
+    'window': 'windows', 
+    'child': 'kids', 
+    'explore': '', 
+    'time': '', 
+    'lockdown': '', 
+    'outside': '', 
+    'relationship': 'relationships', 
+    'appreciate': '', 
+    'love': '', 
+    'isolation': '', 
+    'apart': '',
+    'market': 'shopping',
+    'shop': 'shopping',
+    'imagine': 'imagination',
+    'routine': ''
+}
 context = ssl._create_unverified_context()
 
 
 url = 'https://www.citylab.com/life/2020/04/neighborhood-maps-coronavirus-lockdown-stay-at-home-art/610018/?utm_campaign=socialflow-organic&utm_source=twitter&utm_medium=social&utm_content=citylab'
 
 
-def get_tags():
-    my_tags = []
-    # for i in range(0, random.randint(1, 4)):
-    #     my_tags.append(random.choice(tags))
-    return my_tags
+
 
 def save_to_file_json(data, file_name='data.json', subdirectory='results'):
     f = open(subdirectory + '/' + file_name, 'w')
@@ -32,11 +75,22 @@ def save_to_file_json(data, file_name='data.json', subdirectory='results'):
     f.close()
     print('JSON file written to ' + subdirectory + '/' + file_name + '. Go take a look!')
 
+def get_tags(entry):
+    my_tags = []
+    text = ' '.join(entry.get('paragraphs')) + entry.get('header') + entry.get('footer')
+    for key in tags:
+        if text.find(key) != -1:
+            val = tags[key]
+            if val == '':
+                val = key
+            my_tags.append(val)
+    return my_tags
+    
 def get_location(place):
     # url = 'https://api.opencagedata.com/geocode/v1/json?key='  + api_key + \
     #     '&q=' + quote(place) + '&limit=2'
     url = 'https://nominatim.openstreetmap.org/search?q=' + quote(place) + '&format=jsonv2&addressdetails=1&namedetails=1'
-    print(url)
+    # print(url)
     # return
     try:
         data = json.loads(urlopen(url, context=context).read())
@@ -51,13 +105,22 @@ def get_location(place):
         return place
         
     except Exception as e:
-        print(e)
+        print('location parsing error:', e)
+        print(place)
         return None
-    # print(data['results'][0]['components']['continent'])
-    # print(data['results'][0]['components']['country'])
-    # print(data['results'][0]['components']['state'])
-    # print(data['results'][0]['geometry'])
-    # return data
+
+def download_images(entry):
+    try:
+        for key in ['image_source', 'image_source_large', 'image_source_orig']:
+            path = entry[key]
+            print('Downloading', path, '...')
+            file_name = path.split('/')[-1]
+            local_path = download_image(path, file_name)
+            entry[key + '_local'] = local_path
+            # be polite:
+            time.sleep(1)
+    except Exception:
+        print('Error downloading file name')
 
 def download_image(image_url, file_name):
     # get the image
@@ -88,12 +151,13 @@ for element in article.find_all(['p', 'h4', 'hr', 'figure']):
             entry['author'] = tokens[0].replace('—', '')
             entry['place'] = ','.join(tokens[1:])
             entry['location'] = get_location(entry['place'])
+            entry['tags'] = get_tags(entry)
         start = True
         entry = {
             'id': counter,
             'header': None,
             'paragraphs': [],
-            'tags': get_tags()
+            'tags': []
         }
         article_list.append(entry)
         counter += 1
@@ -109,22 +173,31 @@ for element in article.find_all(['p', 'h4', 'hr', 'figure']):
             break
         entry['header'] = element.text
     elif element.name == 'figure':
-        image_url = element.find('img').get('data-src')
-        file_name = image_url.split('/')[-1]
-        entry['image_source'] = image_url
-        # try:
-        #     print('Downloading', image_url, '...')
-        #     local_path = download_image(image_url,  file_name)
-        #     entry['image_local'] = local_path
-        #     # be polite:
-        #     time.sleep(0.5)
-        # except Exception:
-        #     print('Error downloading file name')
+        img = element.find('img')
+        if img.get('data-srcset'):
+            print('plural')
+            image_urls = img.get('data-srcset')
+            image_url_low_res = image_urls.split(', ')[0].split(' ')[0]
+            image_url_high_res = image_urls.split(', ')[-1].split(' ')[0]
+            # print(image_url_low_res)
+            # print(image_url_high_res)
+        else:
+            print('singular')
+            image_url_low_res = image_url_high_res = img.get('data-src')
+            # print(image_url_low_res)
+        # break 
+        entry['image_source'] = image_url_low_res
+        entry['image_source_large'] = image_url_high_res
+        entry['image_source_orig'] = 'https:' + image_url_high_res.split('/https:')[-1]
+        if do_downloads:
+            download_images(entry)
+
 footer = entry['paragraphs'].pop()
 entry['footer'] = footer
 tokens = footer.split(',')
 entry['author'] = tokens[0].replace('—', '')
 entry['place'] = ','.join(tokens[1:])
 entry['location'] = get_location(entry['place'])
+entry['tags'] = get_tags(entry)
 
 save_to_file_json(article_list)
