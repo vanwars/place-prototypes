@@ -10,7 +10,7 @@ const flattenObject = (ob) => {
 	for (var i in ob) {
 		if (!ob.hasOwnProperty(i)) continue;
 		
-		if ((typeof ob[i]) == 'object') {
+		if ((typeof ob[i]) == 'object' && !Array.isArray(ob[i])) {
 			var flatObject = flattenObject(ob[i]);
 			for (var x in flatObject) {
 				if (!flatObject.hasOwnProperty(x)) continue;
@@ -34,12 +34,10 @@ const sortDesc = (obj, f) => {
             return b[1] - a[1];
         };
     }
-    console.log(f);
     var sortable = [];
     for (const key in obj) {
         sortable.push([key, obj[key]]);
     }
-    // sortable.sort(f);
     return sortable;
 };
 
@@ -96,90 +94,82 @@ const getCounts = (groupBy, list) => {
         d[key] = d[key] + 1 || 1;
         return d;
       }, {});
-    //console.log(Object.keys(list[0]));
     return sortDesc(countsByGrouping);
 };
 
-const getImages = (groupBy, list) => {
-    const countsByGrouping = list.reduce((d, item) => {
+const reduceToListOfLists = (groupBy, list, attribute) => {
+    const d = list.reduce((d, item) => {
         const key = item[groupBy] || 'Missing';
-        const imageURL = item['image_source'];
+        const imageURL = item[attribute];
         if (!d[key]) {
             d[key] = [];
         }
         d[key].push(imageURL);
         return d;
     }, {});
-    
-    const sortedList = sortDesc(countsByGrouping, function(a, b) {
+    return sortDesc(d, function(a, b) {
         return b[1].length - a[1].length;
     });
-    for (let i = 0; i < sortedList.length; i++) {
-        let html = '';
-        let counter = 0.5;
-        for (const url of sortedList[i][1]) {
-            const delay = counter.toFixed(2) + 's;';
-            html += `<img style="animation-delay: ${delay}" src="${url}" />`;
-            counter += 0.1;
-        }
-        sortedList[i][1] = html;
-    }
-    return sortedList;
 };
-
-const getText = (groupBy, list, attribute) => {
-    const countsByGrouping = list.reduce((d, item) => {
-        const key = item[groupBy] || 'Unknown';
-        if (!d[key]) {
-            d[key] = [];
-        }
-        d[key].push(item[attribute] || 'Unknown');
-        return d;
-    }, {});
-    
-    const sortedList = sortDesc(countsByGrouping, function(a, b) {
-        return b[1].length - a[1].length;
-    });
-    for (let i = 0; i < sortedList.length; i++) {
-        let html = '<ul class="wrapper">';
-        let counter = 0.5;
-        // get unique values:
-        const uniqueList = sortedList[i][1].filter((value, index, self) => {
-            return self.indexOf(value) === index;
-        });
-        uniqueList.sort();
-        for (const text of uniqueList) {
-            const delay = counter.toFixed(2) + 's;';
-            html += `<li style="animation-delay: ${delay}">${text}</li>`;
-            counter += 0.05;
-        }
-        sortedList[i][1] = html + '</ul>';
-    }
-    return sortedList;
-};
-
-const getNums = (groupBy, list, attribute) => {
-    const listsByGrouping = list.reduce((d, item) => {
+const reduceToListOfListsTags = (groupBy, list, attribute) => {
+    const d = list.reduce((d, item) => {
         const key = item[groupBy] || 'Missing';
+        const tags = item[attribute];
         if (!d[key]) {
             d[key] = [];
         }
-        d[key].push(item[attribute] || 'Missing');
+        d[key] = d[key].concat(tags);
         return d;
     }, {});
-    
-    const sortedList = sortDesc(listsByGrouping);
-    for (let i = 0; i < sortedList.length; i++) {
-        sortedList[i][1].sort(compareNumbers);
-        let html = '<ul class="wrapper numbers">';
-        let counter = 0.5;
-        for (const text of sortedList[i][1]) {
-            const delay = counter.toFixed(2) + 's;';
-            html += `<li style="animation-delay: ${delay}">${text}</li>`;
-            counter += 0.05;
-        }
-        html += '</ul>';
-        sortedList[i][1] = html;
+    return sortDesc(d, function(a, b) {
+        return b[1].length - a[1].length;
+    });
+};
+
+const toHTMLImageList = (image_urls) => {
+    return image_urls
+}
+
+const getImages = (groupBy, list) => {
+    const sortedList = reduceToListOfLists(groupBy, list, 'image_source');
+    for (const item of sortedList) {
+        item[1] = item[1].map((item, i) => {
+            const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
+            return `<img style="animation-delay: ${delay}" src="${item}" />`;
+        }).join('');
+    }
+    return sortedList;
+};
+const getText = (groupBy, list, attribute, className) => {
+    className = className || 'wrapper';
+    const sortedList = reduceToListOfLists(groupBy, list, attribute);
+    for (const item of sortedList) {
+        const lis = 
+            item[1]
+                .filter((value, index, self) => {
+                    return self.indexOf(value) === index;
+                }).map((item, i) => {
+                    const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
+                    return `<li style="animation-delay: ${delay}">${item || 'Missing'}</li>`;
+                }).join('');
+        item[1] = `<ul class="${className}">` + lis + `</ul>`;
+    }
+    return sortedList;
+};
+
+const getTags = (groupBy, list, attribute, className) => {
+    className = className || 'wrapper';
+    const sortedList = reduceToListOfListsTags(groupBy, list, attribute);
+    for (const item of sortedList) {
+        const tags = 
+            item[1]
+                .filter((value, index, self) => {
+                    return self.indexOf(value) === index;
+                }).map((item, i) => {
+                    const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
+                    return `<span class="tag" style="animation-delay: ${delay}">${item}</span>`;
+                }).join('');
+        item[1] = tags
     }
     return sortedList;
 };
@@ -194,11 +184,13 @@ const renderData = () => {
     const columns = [
         { name: 'count', type: 'count', title: 'Count' }, 
         { name: 'image_source', type: 'image', width: 450, title: 'Map Image' }, 
+        { name: 'tags', type: 'tags', width: 340, title: 'Tags'}, 
         { name: 'id', type: 'int', title: 'ID', width: 200 }, 
         { name: 'location.country', type: 'text', title: 'Country', width: 340 }, 
         { name: 'location.state', type: 'text', title: 'State', width: 340 }, 
         { name: 'location.city', type: 'text', title: 'City', width: 340 }, 
-        { name: 'author', type: 'text', width: 340, title: 'Author'} //,
+        { name: 'author', type: 'text', width: 340, title: 'Author'}
+         //,
         //{ name: 'header', type: 'text', width: 700, title: 'Map Title' }
     ]
     for (column of columns) {
@@ -209,7 +201,9 @@ const renderData = () => {
         } else if (column.type === 'text') {
             column.data = getText(groupBy, visibleMapData, column.name);
         } else if (column.type === 'int') {
-            column.data = getNums(groupBy, visibleMapData, column.name);
+            column.data = getText(groupBy, visibleMapData, column.name, 'wrapper numbers');
+        } else if (column.type === 'tags') {
+            column.data = getTags(groupBy, visibleMapData, column.name);
         } else {
             console.error(column.type, 'is unknown');
         }
