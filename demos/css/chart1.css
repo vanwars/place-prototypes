@@ -2,6 +2,21 @@ main {
     width: 2000px;
 }
 
+::-webkit-scrollbar {
+    width: 18px;
+    height: 18px;
+    border: solid 1px #CCC;
+    background-color: #fff;
+}
+  
+::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    /* background-color: rgba(0, 0, 0, .5); */
+    background-color: #dae1e4;
+    border: solid 1px #CCC;
+    box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
 img {
     height: 60px; 
     margin-right: 7px;
@@ -127,4 +142,10 @@ table th:first-child {
         /* opacity: 1;  */
         transform: rotate(0deg);
     }
- }
+}
+
+@media (max-width: 700px) {
+    .chart table th {
+        top: 110px;
+    }
+}

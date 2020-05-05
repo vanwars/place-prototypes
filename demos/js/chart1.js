@@ -180,7 +180,7 @@ const renderData = () => {
     let selectElement = document.querySelector("#tag-selection");
     const groupBy = selectElement ? selectElement.value : 'location.country';
     const tagName = groupBy.split('.')[groupBy.split('.').length - 1];
-    //let data;
+
     const columns = [
         { name: 'count', type: 'count', title: 'Count' }, 
         { name: 'image_source', type: 'image', width: 450, title: 'Map Image' }, 
@@ -190,8 +190,6 @@ const renderData = () => {
         { name: 'location.state', type: 'text', title: 'State', width: 340 }, 
         { name: 'location.city', type: 'text', title: 'City', width: 340 }, 
         { name: 'author', type: 'text', width: 340, title: 'Author'}
-         //,
-        //{ name: 'header', type: 'text', width: 700, title: 'Map Title' }
     ]
     for (column of columns) {
         if (column.type === 'count') {
@@ -219,11 +217,8 @@ const renderData = () => {
 
     // make sure correct item is selected:
     selectElement = document.querySelector("#tag-selection");
-    //aggregationElement = document.querySelector("#aggregation-type");
     setOption(selectElement, groupBy);
-    //setOption(aggregationElement, aggregationType);
     selectElement.onchange = renderData;
-    //aggregationElement.onchange = renderData;
 };
 
 const init = () => {
