@@ -10,7 +10,7 @@ function resizableGrid(table) {
     for (var i=0;i<cols.length;i++){
         var div = createDiv(tableHeight);
         cols[i].appendChild(div);
-        cols[i].style.position = 'relative';
+        //cols[i].style.position = 'relative';
         setListeners(div);
     }
 
@@ -44,10 +44,10 @@ function resizableGrid(table) {
             if (curCol) {
                 var diffX = e.pageX - pageX;
     
-            if (nxtCol)
-                nxtCol.style.width = (nxtColWidth - (diffX))+'px';
+            // if (nxtCol)
+            //     nxtCol.style.width = (nxtColWidth - (diffX))+'px';
 
-            curCol.style.width = (curColWidth + diffX)+'px';
+            curCol.style.minWidth = (curColWidth + diffX)+'px';
         }
     });
 
