@@ -1,30 +1,34 @@
 main {
-    padding-top: 10px;
-    padding-left: 10vw;
-    padding-right: 10vw;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    flex-direction: column;
+    width: 2000px;
+}
+
+::-webkit-scrollbar {
+    width: 18px;
+    height: 18px;
+    border: solid 1px #CCC;
+    background-color: #fff;
+}
+  
+::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    /* background-color: rgba(0, 0, 0, .5); */
+    background-color: #dae1e4;
+    border: solid 1px #CCC;
+    box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
 img {
-    height: 80px; 
+    height: 60px; 
+    margin-right: 7px;
     opacity: 0;
     animation-timing-function: linear;
-    animation-duration: 0.2s;
-    animation-fill-mode: forwards;
-    animation-name: fadeIn;
+    animation-duration: 0.3s, 0.4s;
+    animation-fill-mode: forwards, none;
+    animation-name: fadeIn, tilt;
+    transition: all 0.3s ease-out;
 }
-td p {
-    /* height: 80px;  */
-    opacity: 0;
-    animation-timing-function: linear;
-    animation-duration: 0.1s;
-    animation-fill-mode: forwards;
-    animation-name: fadeIn;
-    display: inline;
-    /* font: 1.4em "Amatic SC", cursive; */
+img:hover {
+    transform: rotate(5deg);
 }
 
 select {
@@ -35,27 +39,84 @@ select {
     color: #444;
     padding: 0px 20px 0px 40px;
 }
-
-
-table {
-    width: 100%;
+.wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 0px;
+    margin-top: 0px;
+}
+.wrapper > li {
+    padding-left: 16px;
+    opacity: 0;
+    animation-timing-function: linear;
+    animation-duration: 0.1s;
+    animation-fill-mode: forwards;
+    animation-name: fadeIn;
+    /* display: inline; */
+    width: 50%;
+    margin: 0px;
+    padding: 0px;
+    padding-left: 0.5em; 
+    text-indent: -0.6em;
+    list-style-type: none;
+}
+.wrapper.numbers > li {
+    width: 30px;
+}
+.wrapper.numbers > li::before {
+    content: "";
+}
+.tag {
+    opacity: 0;
+    animation-timing-function: linear;
+    animation-duration: 0.1s;
+    animation-fill-mode: forwards;
+    animation-name: fadeIn;
 }
 
-table th {
+.wrapper > li::before {
+    content: "• ";
+    color: #7B8CDE;
+}
+
+table {
+    width: auto;
+    border-collapse: initial;
+    border-spacing: 0px;
+}
+
+.chart table th {
     text-align: left;
     color: #666;
-    background: #F0F0F0;
+    background: #f1f3f4;
+    position: sticky;
+    top: 70px;
+    z-index: 200;
+    vertical-align: middle !important;
+}
+table td:first-child, table th:first-child {
+    position: sticky;
+    left: 0px;
+}
+table th:first-child {
+    z-index: 100000;
+}
+table td:first-child {
+    background: #f1f3f4;
+    z-index: 100;
 }
 .chart table th, .chart table td {
     padding: 6px;
-    font-size: 1rem;
+    font-size: 1em;
     vertical-align: top;
+    margin: 0px;
+    border-left: solid transparent 0px;
+    border-top: solid transparent 0px;
+    border-bottom: dotted #CCC 1px;
+    border-right: dotted #CCC 1px;
 }
-table td p::after {
-    content: ' - ';
-}
-table td p:last-child::after {
-    content: '';
+.chart table th {
+    border-top: dotted #CCC 1px;
 }
 table th:first-child {
     width: 280px !important;
@@ -63,6 +124,28 @@ table th:first-child {
 
 
 @keyframes fadeIn {
-    from {  opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0; 
+        /* transform: rotate(-10deg); */
+    }
+    to { 
+        opacity: 1; 
+        /* transform: rotate(0deg); */
+    }
  }
+ @keyframes tilt {
+    from {
+        /* opacity: 0;  */
+        transform: rotate(-10deg);
+    }
+    to { 
+        /* opacity: 1;  */
+        transform: rotate(0deg);
+    }
+}
+
+@media (max-width: 700px) {
+    .chart table th {
+        top: 110px;
+    }
+}

@@ -10,11 +10,11 @@ const flattenObject = (ob) => {
 	for (var i in ob) {
 		if (!ob.hasOwnProperty(i)) continue;
 		
-		if ((typeof ob[i]) == 'object') {
+		if ((typeof ob[i]) == 'object' && !Array.isArray(ob[i])) {
 			var flatObject = flattenObject(ob[i]);
 			for (var x in flatObject) {
 				if (!flatObject.hasOwnProperty(x)) continue;
-				
+		
 				toReturn[i + '.' + x] = flatObject[x];
 			}
 		} else {
@@ -24,56 +24,48 @@ const flattenObject = (ob) => {
 	return toReturn;
 };
 
-const sortDesc = (obj, f) => {
-    if (!f) {
-        f = function(a, b) {
-            return b[1] - a[1];
-        };
-    }
-    console.log(f);
-    var sortable = [];
-    for (const key in obj) {
-        sortable.push([key, obj[key]]);
-    }
-    sortable.sort(f);
-    return sortable;
-};
 
-const generateTable = (list) => {
+const generateTable = (data, columns) => {
+    let ths = '';
+    for (const column of columns) {
+        ths += `<th style="min-width:${column.width || 100}px;">${column.title}</th>`
+    }
     let html = `<table>
             <thead>
                 <tr>
-                    <th>
-                        Grouping Field: 
+                    <th style="min-width: 150px;">
                         <select id="tag-selection">
                             <option value="location.country">Country</option>
                             <option value="location.state">State</option>
                             <option value="location.city">City</option>
-                            <option value="author">Individuals</option>
-                            <!-- option value="tags">Tags</option -->
+                            <option value="id">Individuals</option>
+                            <option value="tags">Tags</option>
                         </select>
                     </th>
-                    <th>
-                        Display Field: 
-                        <select id="aggregation-type">
-                            <option value="count">Count</option>
-                            <!-- option value="tags">Tags</option -->
-                            <option value="image_source">Picture</option>
-                            <option value="author">Author</option>
-                            <option value="header">Map Title</option>
-                            <option value="location.country">Country</option>
-                            <option value="location.state">State</option>
-                            <option value="location.city">City</option>
-                        </select>
-                    </th>
+                    ${ths}
                 </tr>
             </thead>
             <tbody>`;
-    for (const row of list) {
-        html += `<tr><td>` + row.join('</td><td>') + `</td></tr>`;
+    const header = data.shift();
+    for (row of data) {
+        html += `<tr>`
+        for (let i = 0; i < row.length; i++) {
+            const cell = row[i];
+            if (i > 0) {
+                const formatter = columns[i-1].formatter;
+                html += `<td>${formatter(cell)}</td>`;
+            } else {
+                html += `<td>${cell}</td>`;
+            }
+        }
+        html += `</tr>`;
     }
     html += `</tbody></table>`;
     return html;
+};
+
+const compareNumbers = (a, b) => {
+    return a - b;
 };
 
 const setOption = (selectElement, value) => {
@@ -85,113 +77,149 @@ const setOption = (selectElement, value) => {
     });
 }
 
-const getCounts = (groupBy, list) => {
-    const countsByGrouping = list.reduce((d, item) => {
-        const key = item[groupBy] || 'Unknown';
-        d[key] = d[key] + 1 || 1;
-        return d;
-      }, {});
-    //console.log(Object.keys(list[0]));
-    return sortDesc(countsByGrouping);
+const getUniqueValues = (data) => {
+    return data.filter((value, index, self) => {
+        return self.indexOf(value) === index && value !== 'Missing';
+    });
+}
+
+const toCommaDelimitedList = (data) => {
+    data = getUniqueValues(data);
+    return data.join(', ');
 };
 
-const getImages = (groupBy, list) => {
-    const countsByGrouping = list.reduce((d, item) => {
-        const key = item[groupBy] || 'Unknown';
-        const imageURL = item['image_source'];
-        if (!d[key]) {
-            d[key] = [];
-        }
-        d[key].push(imageURL);
-        return d;
-    }, {});
-    
-    const sortedList = sortDesc(countsByGrouping, function(a, b) {
-        return b[1].length - a[1].length;
-    });
-    for (let i = 0; i < sortedList.length; i++) {
-        let html = '';
-        let counter = 1;
-        for (const url of sortedList[i][1]) {
-            const delay = counter.toFixed(2) + 's;';
-            html += `<img style="animation-delay: ${delay}" src="${url}" />`;
-            counter += 0.1;
-        }
-        sortedList[i][1] = html;
-    }
-    return sortedList;
+const toHTMLImages = (imageURLs) => {
+    return imageURLs.map((item, i) => {
+        const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
+        return `<img style="animation-delay: ${delay}" src="${item}" />`;
+    }).join('');
+};
+const toHTMLList = (data) => {
+    data = getUniqueValues(data);
+    return '<ul class="wrapper">' + data.map((item, i) => {
+        const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
+        return `<li style="animation-delay: ${delay}">${item}</li>`;
+    }).join('') + '</ul>';
 };
 
-const getText = (groupBy, list, attribute) => {
-    const countsByGrouping = list.reduce((d, item) => {
-        const key = item[groupBy] || 'Unknown';
-        if (!d[key]) {
-            d[key] = [];
-        }
-        d[key].push(item[attribute] || 'Unknown');
-        return d;
-    }, {});
-    
-    const sortedList = sortDesc(countsByGrouping, function(a, b) {
-        return b[1].length - a[1].length;
-    });
-    for (let i = 0; i < sortedList.length; i++) {
-        let html = '';
-        let counter = 0;
-        // get unique values:
-        const uniqueList = sortedList[i][1].filter((value, index, self) => {
-            return self.indexOf(value) === index;
-        });
-        uniqueList.sort();
-        for (const text of uniqueList) {
-            const delay = counter.toFixed(2) + 's;';
-            html += `<p style="animation-delay: ${delay}">${text}</p>`;
-            counter += 0.05;
-        }
-        sortedList[i][1] = html;
-    }
-    return sortedList;
+const toTagList = (data) => {
+    data = getUniqueValues(data);
+    return data.map((item, i) => {
+        const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
+        return `<span class="tag" style="animation-delay: ${delay}">${item}</span>`;
+    }).join('');
 };
+
+
+const updateEntry = (entry, row, columns) => {
+    for (const column of columns) {
+        // 1) initialize as int or list:
+        if (!entry[column.name]) {
+            if (column.type === 'count') {
+                entry[column.name] = 0
+            } else {
+                entry[column.name] = []
+            }
+        }
+        // 2) apply aggregation operation
+        if (column.type === 'count') {
+            entry[column.name] += 1;
+        } else if (column.type === 'tags') {
+            entry[column.name] = entry[column.name].concat(row[column.name])
+        } else {
+            entry[column.name].push(row[column.name] || 'Missing')
+        }
+    }
+}
+const collapseByTag = (visibleData, columns) => {
+    // first, get a list of all the unique tags:
+    let tags = [];
+    for (const row of visibleData) {
+        tags = tags.concat(row['tags']);
+    }
+    tags = getUniqueValues(tags);
+    
+    const data = {}
+    for (const tag of tags) {
+        data[tag] = {};
+        for (const row of visibleData) {
+            if (row['tags'].indexOf(tag) != -1) {
+                updateEntry(data[tag], row, columns);
+            }
+        }
+    }
+    return data; 
+};
+
+const collapseBy = (groupBy, visibleData, columns) => {
+    if (groupBy === 'tags') {
+        return collapseByTag(visibleData, columns);
+    } else {
+        data = {}
+        for (const row of visibleData) {
+            const key = row[groupBy] || 'Missing';
+            if (!data[key]) {
+                data[key]= {};
+            }
+            updateEntry(data[key], row, columns);
+        }
+        return data;  
+    }
+};
+
+const toSortedMatrix = (groupBy, visibleMapData, columns, sortBy) => {
+    const rows = []
+    const headers = [groupBy].concat(columns.map(item => item.name));
+    const sortIndex = headers.indexOf(sortBy);
+    //console.log(sortIndex);
+    rows.push(headers);
+    for (const key in visibleMapData) {
+        const val = visibleMapData[key];
+        const row = [key]
+        for (const column of columns) {
+            row.push(val[column.name]);
+        }
+        rows.push(row);
+    }
+
+    rows.sort(function(first, second) {
+        return second[sortIndex] - first[sortIndex];
+    });
+    return rows;
+}
 
 const renderData = () => {
     const visibleMapData = mapData.filter(map => !map.hide).map( item => flattenObject(item));
-    const container = document.querySelector('main');
     let selectElement = document.querySelector("#tag-selection");
-    let aggregationElement = document.querySelector("#aggregation-type");
-    const groupBy = selectElement ? selectElement.value : 'location.country';
-    const aggregationType = aggregationElement ? aggregationElement.value : 'count';
+    const groupBy = selectElement ? selectElement.value : 'tags'; //'location.country';
+    
+    const container = document.querySelector('main');
     const tagName = groupBy.split('.')[groupBy.split('.').length - 1];
-    let data;
-    if (aggregationType === 'count') {
-        data = getCounts(groupBy, visibleMapData);
-    } else if (aggregationType === 'image_source') {
-        data = getImages(groupBy, visibleMapData);
-    } else if (aggregationType === 'header') {
-        data = getText(groupBy, visibleMapData, aggregationType);
-    } else if (aggregationType === 'author') {
-        data = getText(groupBy, visibleMapData, aggregationType);
-    } else if (aggregationType === 'location.city') {
-        data = getText(groupBy, visibleMapData, aggregationType);
-    } else if (aggregationType === 'location.state') {
-        data = getText(groupBy, visibleMapData, aggregationType);
-    } else if (aggregationType === 'location.country') {
-        data = getText(groupBy, visibleMapData, aggregationType);
-    }
+
+    const columns = [
+        { name: 'count', type: 'count', title: 'Count', formatter: String }, 
+        { name: 'image_source', type: 'image', width: 450, title: 'Map Image', formatter: toHTMLImages }, 
+        { name: 'tags', type: 'tags', width: 340, title: 'Tags', formatter: toTagList }, 
+        { name: 'id', type: 'int', title: 'ID', width: 200, formatter: toCommaDelimitedList }, 
+        { name: 'location.country', type: 'text', title: 'Country', width: 340, formatter: toHTMLList }, 
+        { name: 'location.state', type: 'text', title: 'State', width: 340, formatter: toHTMLList }, 
+        { name: 'location.city', type: 'text', title: 'City', width: 340, formatter: toHTMLList }, 
+        { name: 'author', type: 'text', width: 340, title: 'Author', formatter: toHTMLList }
+    ]
+    const dataDictionary = collapseBy(groupBy, visibleMapData, columns);
+    const matrix = toSortedMatrix(groupBy, dataDictionary, columns, 'count')
     const searchTerm = document.querySelector('#search-bar').value;
     if (searchTerm.length > 0) {
         container.innerHTML = `<p>Counts of <strong>${tagName}</strong> where the word <strong>${searchTerm}</strong> exists ANYWHERE in the submission.</p>`;
     } else {
         container.innerHTML = `<p> </p>`;
     }
-    container.innerHTML += generateTable(data);
+    container.innerHTML += generateTable(matrix, columns);
 
     // make sure correct item is selected:
     selectElement = document.querySelector("#tag-selection");
-    aggregationElement = document.querySelector("#aggregation-type");
     setOption(selectElement, groupBy);
-    setOption(aggregationElement, aggregationType);
     selectElement.onchange = renderData;
-    aggregationElement.onchange = renderData;
 };
 
 const init = () => {
