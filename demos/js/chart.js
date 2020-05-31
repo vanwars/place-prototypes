@@ -28,7 +28,7 @@ const flattenObject = (ob) => {
 const generateTable = (data, columns) => {
     let ths = '';
     for (const column of columns) {
-        ths += `<th style="min-width:${column.width || 100}px;">${column.title}</th>`
+        ths += `<th style="width:${column.width || 100}px;">${column.title}</th>`
     }
     let html = `<table>
             <thead>
@@ -215,6 +215,13 @@ const renderData = () => {
         container.innerHTML = `<p> </p>`;
     }
     container.innerHTML += generateTable(matrix, columns);
+
+    // var tables = document.getElementsByTagName('table');
+    // for (var i=0; i<tables.length;i++) {
+    //     resizableGrid(tables[i]);
+    // }
+
+
 
     // make sure correct item is selected:
     selectElement = document.querySelector("#tag-selection");
