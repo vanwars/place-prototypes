@@ -25,20 +25,26 @@ const flattenObject = (ob) => {
 };
 
 
-const generateTable = (data, columns) => {
+const generateTable = (data, columns, groupBy) => {
     let ths = '';
     for (const column of columns) {
-        ths += `<th style="min-width:${column.width || 100}px;">${column.title}</th>`
+        let title = column.title;
+        if (column.name === 'count') {
+            let features = groupBy.split('.');
+            let feature = features[features.length - 1].replace('tags', 'tag');
+            title = '# of Entries by ' + feature[0].toUpperCase() + feature.slice(1);
+        }
+        ths += `<th style="min-width:${column.width || 100}px;">${title}</th>`
     }
     let html = `<table class="draggable">
             <thead>
                 <tr>
                     <th class="no-drag" style="min-width: 150px;">
                         <select id="tag-selection">
-                            <option value="location.country">Country</option>
-                            <option value="location.state">State</option>
-                            <option value="location.city">City</option>
                             <option value="id">Individuals</option>
+                            <option value="location.city">City</option>
+                            <option value="location.state">State</option>
+                            <option value="location.country">Country</option>
                             <option value="tags">Tags</option>
                         </select>
                     </th>
@@ -79,7 +85,7 @@ const setOption = (selectElement, value) => {
 
 const getUniqueValues = (data) => {
     return data.filter((value, index, self) => {
-        return self.indexOf(value) === index && value !== 'Missing';
+        return self.indexOf(value) === index && value !== 'Unknown';
     });
 }
 
@@ -94,6 +100,11 @@ const toHTMLImages = (imageURLs) => {
         return `<img style="animation-delay: ${delay}" src="${item}" />`;
     }).join('');
 };
+
+const toParagraphs = (data) => {
+    return '<p>' + data.join('</p><p>') + '</p>'
+};
+
 const toHTMLList = (data) => {
     data = getUniqueValues(data);
     return '<ul class="wrapper">' + data.map((item, i) => {
@@ -111,7 +122,7 @@ const toTagList = (data) => {
 };
 
 
-const updateEntry = (entry, row, columns) => {
+const updateEntry = (entry, row, columns, groupBy) => {
     for (const column of columns) {
         // 1) initialize as int or list:
         if (!entry[column.name]) {
@@ -124,10 +135,10 @@ const updateEntry = (entry, row, columns) => {
         // 2) apply aggregation operation
         if (column.type === 'count') {
             entry[column.name] += 1;
-        } else if (column.type === 'tags') {
+        } else if (column.type === 'list') {
             entry[column.name] = entry[column.name].concat(row[column.name])
         } else {
-            entry[column.name].push(row[column.name] || 'Missing')
+            entry[column.name].push(row[column.name] || 'Unknown')
         }
     }
 }
@@ -144,7 +155,7 @@ const collapseByTag = (visibleData, columns) => {
         data[tag] = {};
         for (const row of visibleData) {
             if (row['tags'].indexOf(tag) != -1) {
-                updateEntry(data[tag], row, columns);
+                updateEntry(data[tag], row, columns, 'tags');
             }
         }
     }
@@ -157,11 +168,11 @@ const collapseBy = (groupBy, visibleData, columns) => {
     } else {
         data = {}
         for (const row of visibleData) {
-            const key = row[groupBy] || 'Missing';
+            const key = row[groupBy] || 'Unknown';
             if (!data[key]) {
                 data[key]= {};
             }
-            updateEntry(data[key], row, columns);
+            updateEntry(data[key], row, columns, groupBy);
         }
         return data;  
     }
@@ -171,7 +182,6 @@ const toSortedMatrix = (groupBy, visibleMapData, columns, sortBy) => {
     const rows = []
     const headers = [groupBy].concat(columns.map(item => item.name));
     const sortIndex = headers.indexOf(sortBy);
-    //console.log(sortIndex);
     rows.push(headers);
     for (const key in visibleMapData) {
         const val = visibleMapData[key];
@@ -191,21 +201,27 @@ const toSortedMatrix = (groupBy, visibleMapData, columns, sortBy) => {
 const renderData = () => {
     const visibleMapData = mapData.filter(map => !map.hide).map( item => flattenObject(item));
     let selectElement = document.querySelector("#tag-selection");
-    const groupBy = selectElement ? selectElement.value : 'tags'; //'location.country';
+    const groupBy = selectElement ? selectElement.value : 'id'; //'location.country';
     
     const container = document.querySelector('main');
     const tagName = groupBy.split('.')[groupBy.split('.').length - 1];
 
     const columns = [
-        { name: 'count', type: 'count', title: 'Count', formatter: String }, 
-        { name: 'image_source', type: 'image', width: 450, title: 'Map Image', formatter: toHTMLImages }, 
-        { name: 'tags', type: 'tags', width: 340, title: 'Tags', formatter: toTagList }, 
+        { name: 'image_source', type: 'image', width: 500, title: 'Map Image', formatter: toHTMLImages }, 
+        { name: 'tags', type: 'list', width: 340, title: 'Tags', formatter: toTagList }, 
         { name: 'id', type: 'int', title: 'ID', width: 200, formatter: toCommaDelimitedList }, 
         { name: 'location.country', type: 'text', title: 'Country', width: 340, formatter: toHTMLList }, 
         { name: 'location.state', type: 'text', title: 'State', width: 340, formatter: toHTMLList }, 
         { name: 'location.city', type: 'text', title: 'City', width: 340, formatter: toHTMLList }, 
         { name: 'author', type: 'text', width: 340, title: 'Author', formatter: toHTMLList }
     ]
+    if (groupBy != "id") {
+        columns.unshift({ name: 'count', type: 'count', width: 180, title: 'Count', formatter: String }) 
+    } 
+    else {
+        columns.push({ name: 'header', type: 'type', width: 340, title: 'Title', formatter: String });
+        columns.push({ name: 'paragraphs', type: 'list', width: 540, title: 'Description', formatter: toParagraphs });
+    }
     const dataDictionary = collapseBy(groupBy, visibleMapData, columns);
     const matrix = toSortedMatrix(groupBy, dataDictionary, columns, 'count')
     const searchTerm = document.querySelector('#search-bar').value;
@@ -214,7 +230,7 @@ const renderData = () => {
     } else {
         container.innerHTML = `<p> </p>`;
     }
-    container.innerHTML += generateTable(matrix, columns);
+    container.innerHTML += generateTable(matrix, columns, groupBy);
     
     // add dragging, sorting, adjusting functionality:
     const table = document.querySelector('main table');

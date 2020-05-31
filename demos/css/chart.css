@@ -18,7 +18,7 @@ main {
 }
 
 img {
-    height: 60px; 
+    height: 100px; 
     margin-right: 7px;
     opacity: 0;
     animation-timing-function: linear;
@@ -120,6 +120,11 @@ table td:first-child {
 }
 table th:first-child {
     width: 280px !important;
+}
+
+table td p {
+    margin-top: 0px;
+    font-size: 1.0em;
 }
 
 
