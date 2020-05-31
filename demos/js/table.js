@@ -76,6 +76,11 @@ const renderData = () => {
             <tbody>${tbody}</tbody>
         </table>
     `;
+    
+    // add dragging, sorting, adjusting functionality:
+    const table = document.querySelector('main table');
+    resizableGrid(table);
+    dragtable.makeDraggable(table);
 };
 
 const init = () => {

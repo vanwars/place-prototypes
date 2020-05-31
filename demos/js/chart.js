@@ -30,10 +30,10 @@ const generateTable = (data, columns) => {
     for (const column of columns) {
         ths += `<th style="min-width:${column.width || 100}px;">${column.title}</th>`
     }
-    let html = `<table>
+    let html = `<table class="draggable">
             <thead>
                 <tr>
-                    <th style="min-width: 150px;">
+                    <th class="no-drag" style="min-width: 150px;">
                         <select id="tag-selection">
                             <option value="location.country">Country</option>
                             <option value="location.state">State</option>
@@ -215,14 +215,11 @@ const renderData = () => {
         container.innerHTML = `<p> </p>`;
     }
     container.innerHTML += generateTable(matrix, columns);
-
-    //var tables = document.getElementsByClassName('flexiCol');
-    var tables = document.getElementsByTagName('table');
-    for (var i=0; i<tables.length;i++) {
-        resizableGrid(tables[i]);
-    }
-
-
+    
+    // add dragging, sorting, adjusting functionality:
+    const table = document.querySelector('main table');
+    resizableGrid(table);
+    dragtable.makeDraggable(table);
 
     // make sure correct item is selected:
     selectElement = document.querySelector("#tag-selection");
