@@ -24,24 +24,8 @@ const flattenObject = (ob) => {
 	return toReturn;
 };
 
-const collapseBy = (list, column) => {
 
-};
-
-const sortDesc = (obj, f) => {
-    if (!f) {
-        f = function(a, b) {
-            return b[1] - a[1];
-        };
-    }
-    var sortable = [];
-    for (const key in obj) {
-        sortable.push([key, obj[key]]);
-    }
-    return sortable;
-};
-
-const generateTable = (columns) => {
+const generateTable = (data, columns) => {
     let ths = '';
     for (const column of columns) {
         ths += `<th style="min-width:${column.width || 100}px;">${column.title}</th>`
@@ -62,14 +46,19 @@ const generateTable = (columns) => {
                 </tr>
             </thead>
             <tbody>`;
-    const numRows = columns[0].data.length;
-    for (let rowIdx = 0; rowIdx < numRows; rowIdx++) {
+    for (const key in data) {
+        const row = data[key];
         html += `<tr>`
-        html += `<td>` + columns[0].data[rowIdx][0] + `</td>`;
-        for (let colIdx = 0; colIdx < columns.length; colIdx++) {
-            html += `<td>` + columns[colIdx].data[rowIdx][1] + `</td>`;
+        html += `<td>${key}</td>`;
+        for (const col of columns) {
+            //console.log(col.name);
+            if (col.formatter) {
+                html += `<td>${col.formatter(row[col.name])}</td>`;
+            } else {
+                html += `<td>${row[col.name]}</td>`;
+            }
         }
-        html += `</tr>`
+        html += `</tr>`;
     }
     html += `</tbody></table>`;
     return html;
@@ -88,124 +77,89 @@ const setOption = (selectElement, value) => {
     });
 }
 
-const getCounts = (groupBy, list) => {
-    const countsByGrouping = list.reduce((d, item) => {
-        const key = item[groupBy] || 'Missing';
-        d[key] = d[key] + 1 || 1;
-        return d;
-      }, {});
-    return sortDesc(countsByGrouping);
-};
-
-const reduceToListOfLists = (groupBy, list, attribute) => {
-    const d = list.reduce((d, item) => {
-        const key = item[groupBy] || 'Missing';
-        const imageURL = item[attribute];
-        if (!d[key]) {
-            d[key] = [];
-        }
-        d[key].push(imageURL);
-        return d;
-    }, {});
-    return sortDesc(d, function(a, b) {
-        return b[1].length - a[1].length;
+const getUniqueValues = (data) => {
+    return data.filter((value, index, self) => {
+        return self.indexOf(value) === index && value !== 'Missing';
     });
-};
-const reduceToListOfListsTags = (groupBy, list, attribute) => {
-    const d = list.reduce((d, item) => {
-        const key = item[groupBy] || 'Missing';
-        const tags = item[attribute];
-        if (!d[key]) {
-            d[key] = [];
-        }
-        d[key] = d[key].concat(tags);
-        return d;
-    }, {});
-    return sortDesc(d, function(a, b) {
-        return b[1].length - a[1].length;
-    });
-};
-
-const toHTMLImageList = (image_urls) => {
-    return image_urls
 }
 
-const getImages = (groupBy, list) => {
-    const sortedList = reduceToListOfLists(groupBy, list, 'image_source');
-    for (const item of sortedList) {
-        item[1] = item[1].map((item, i) => {
-            const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
-            return `<img style="animation-delay: ${delay}" src="${item}" />`;
-        }).join('');
-    }
-    return sortedList;
-};
-const getText = (groupBy, list, attribute, className) => {
-    className = className || 'wrapper';
-    const sortedList = reduceToListOfLists(groupBy, list, attribute);
-    for (const item of sortedList) {
-        const lis = 
-            item[1]
-                .filter((value, index, self) => {
-                    return self.indexOf(value) === index;
-                }).map((item, i) => {
-                    const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
-                    return `<li style="animation-delay: ${delay}">${item || 'Missing'}</li>`;
-                }).join('');
-        item[1] = `<ul class="${className}">` + lis + `</ul>`;
-    }
-    return sortedList;
+const toCommaDelimitedList = (data) => {
+    data = getUniqueValues(data);
+    return data.join(', ');
 };
 
-const getTags = (groupBy, list, attribute, className) => {
-    className = className || 'wrapper';
-    const sortedList = reduceToListOfListsTags(groupBy, list, attribute);
-    for (const item of sortedList) {
-        const tags = 
-            item[1]
-                .filter((value, index, self) => {
-                    return self.indexOf(value) === index;
-                }).map((item, i) => {
-                    const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
-                    return `<span class="tag" style="animation-delay: ${delay}">${item}</span>`;
-                }).join('');
-        item[1] = tags
+const toHTMLImages = (imageURLs) => {
+    return imageURLs.map((item, i) => {
+        const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
+        return `<img style="animation-delay: ${delay}" src="${item}" />`;
+    }).join('');
+};
+const toHTMLList = (data) => {
+    data = getUniqueValues(data);
+    return '<ul class="wrapper">' + data.map((item, i) => {
+        const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
+        return `<li style="animation-delay: ${delay}">${item}</li>`;
+    }).join('') + '</ul>';
+};
+
+const toTagList = (data) => {
+    data = getUniqueValues(data);
+    return data.map((item, i) => {
+        const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
+        return `<span class="tag" style="animation-delay: ${delay}">${item}</span>`;
+    }).join('');
+};
+
+const collapseBy = (groupBy, visibleData, columns) => {
+    data = {}
+    for (const row of visibleData) {
+        const key = row[groupBy] || 'Missing';
+        if (!data[key]) {
+            data[key]= {};
+        }
+        aggregatedRec = data[key];
+        for (const column of columns) {
+            // 1) initialize as int or list:
+            if (!aggregatedRec[column.name]) {
+                if (column.type === 'count') {
+                    aggregatedRec[column.name] = 0
+                } else {
+                    aggregatedRec[column.name] = []
+                }
+            }
+            // 2) apply aggregation operation
+            if (column.type === 'count') {
+                aggregatedRec[column.name] += 1;
+            } else if (column.type === 'tags') {
+                aggregatedRec[column.name] = aggregatedRec[column.name].concat(row[column.name])
+            } else {
+                aggregatedRec[column.name].push(row[column.name] || 'Missing')
+            }
+        }
     }
-    return sortedList;
+    return data;
 };
 
 const renderData = () => {
     const visibleMapData = mapData.filter(map => !map.hide).map( item => flattenObject(item));
-    const container = document.querySelector('main');
     let selectElement = document.querySelector("#tag-selection");
     const groupBy = selectElement ? selectElement.value : 'location.country';
+    
+    const container = document.querySelector('main');
     const tagName = groupBy.split('.')[groupBy.split('.').length - 1];
 
     const columns = [
         { name: 'count', type: 'count', title: 'Count' }, 
-        { name: 'image_source', type: 'image', width: 450, title: 'Map Image' }, 
-        { name: 'tags', type: 'tags', width: 340, title: 'Tags'}, 
-        { name: 'id', type: 'int', title: 'ID', width: 200 }, 
-        { name: 'location.country', type: 'text', title: 'Country', width: 340 }, 
-        { name: 'location.state', type: 'text', title: 'State', width: 340 }, 
-        { name: 'location.city', type: 'text', title: 'City', width: 340 }, 
-        { name: 'author', type: 'text', width: 340, title: 'Author'}
+        { name: 'image_source', type: 'image', width: 450, title: 'Map Image', formatter: toHTMLImages }, 
+        { name: 'tags', type: 'tags', width: 340, title: 'Tags', formatter: toTagList }, 
+        { name: 'id', type: 'int', title: 'ID', width: 200, formatter: toCommaDelimitedList }, 
+        { name: 'location.country', type: 'text', title: 'Country', width: 340, formatter: toCommaDelimitedList }, 
+        { name: 'location.state', type: 'text', title: 'State', width: 340, formatter: toHTMLList }, 
+        { name: 'location.city', type: 'text', title: 'City', width: 340, formatter: toHTMLList }, 
+        { name: 'author', type: 'text', width: 340, title: 'Author', formatter: toHTMLList }
     ]
-    for (column of columns) {
-        if (column.type === 'count') {
-            column.data = getCounts(groupBy, visibleMapData);
-        } else if (column.type === 'image') {
-            column.data = getImages(groupBy, visibleMapData);
-        } else if (column.type === 'text') {
-            column.data = getText(groupBy, visibleMapData, column.name);
-        } else if (column.type === 'int') {
-            column.data = getText(groupBy, visibleMapData, column.name, 'wrapper numbers');
-        } else if (column.type === 'tags') {
-            column.data = getTags(groupBy, visibleMapData, column.name);
-        } else {
-            console.error(column.type, 'is unknown');
-        }
-    }
+    const data = collapseBy(groupBy, visibleMapData, columns);
+    console.log(data);
 
     const searchTerm = document.querySelector('#search-bar').value;
     if (searchTerm.length > 0) {
@@ -213,7 +167,7 @@ const renderData = () => {
     } else {
         container.innerHTML = `<p> </p>`;
     }
-    container.innerHTML += generateTable(columns);
+    container.innerHTML += generateTable(data, columns);
 
     // make sure correct item is selected:
     selectElement = document.querySelector("#tag-selection");
