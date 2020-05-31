@@ -46,16 +46,16 @@ const generateTable = (data, columns) => {
                 </tr>
             </thead>
             <tbody>`;
-    for (const key in data) {
-        const row = data[key];
+    const header = data.shift();
+    for (row of data) {
         html += `<tr>`
-        html += `<td>${key}</td>`;
-        for (const col of columns) {
-            //console.log(col.name);
-            if (col.formatter) {
-                html += `<td>${col.formatter(row[col.name])}</td>`;
+        for (let i = 0; i < row.length; i++) {
+            const cell = row[i];
+            if (i > 0) {
+                const formatter = columns[i-1].formatter;
+                html += `<td>${formatter(cell)}</td>`;
             } else {
-                html += `<td>${row[col.name]}</td>`;
+                html += `<td>${cell}</td>`;
             }
         }
         html += `</tr>`;
@@ -140,6 +140,27 @@ const collapseBy = (groupBy, visibleData, columns) => {
     return data;
 };
 
+const toSortedMatrix = (groupBy, visibleMapData, columns, sortBy) => {
+    const rows = []
+    const headers = [groupBy].concat(columns.map(item => item.name));
+    const sortIndex = headers.indexOf(sortBy);
+    //console.log(sortIndex);
+    rows.push(headers);
+    for (const key in visibleMapData) {
+        const val = visibleMapData[key];
+        const row = [key]
+        for (const column of columns) {
+            row.push(val[column.name]);
+        }
+        rows.push(row);
+    }
+
+    rows.sort(function(first, second) {
+        return second[sortIndex] - first[sortIndex];
+    });
+    return rows;
+}
+
 const renderData = () => {
     const visibleMapData = mapData.filter(map => !map.hide).map( item => flattenObject(item));
     let selectElement = document.querySelector("#tag-selection");
@@ -149,7 +170,7 @@ const renderData = () => {
     const tagName = groupBy.split('.')[groupBy.split('.').length - 1];
 
     const columns = [
-        { name: 'count', type: 'count', title: 'Count' }, 
+        { name: 'count', type: 'count', title: 'Count', formatter: String }, 
         { name: 'image_source', type: 'image', width: 450, title: 'Map Image', formatter: toHTMLImages }, 
         { name: 'tags', type: 'tags', width: 340, title: 'Tags', formatter: toTagList }, 
         { name: 'id', type: 'int', title: 'ID', width: 200, formatter: toCommaDelimitedList }, 
@@ -158,16 +179,15 @@ const renderData = () => {
         { name: 'location.city', type: 'text', title: 'City', width: 340, formatter: toHTMLList }, 
         { name: 'author', type: 'text', width: 340, title: 'Author', formatter: toHTMLList }
     ]
-    const data = collapseBy(groupBy, visibleMapData, columns);
-    console.log(data);
-
+    const dataDictionary = collapseBy(groupBy, visibleMapData, columns);
+    const matrix = toSortedMatrix(groupBy, dataDictionary, columns, 'count')
     const searchTerm = document.querySelector('#search-bar').value;
     if (searchTerm.length > 0) {
         container.innerHTML = `<p>Counts of <strong>${tagName}</strong> where the word <strong>${searchTerm}</strong> exists ANYWHERE in the submission.</p>`;
     } else {
         container.innerHTML = `<p> </p>`;
     }
-    container.innerHTML += generateTable(data, columns);
+    container.innerHTML += generateTable(matrix, columns);
 
     // make sure correct item is selected:
     selectElement = document.querySelector("#tag-selection");
