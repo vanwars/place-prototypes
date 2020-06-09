@@ -20,6 +20,9 @@ main {
 img {
     height: 100px; 
     margin-right: 7px;
+}
+
+img.tilt {
     opacity: 0;
     animation-timing-function: linear;
     animation-duration: 0.3s, 0.4s;
@@ -27,7 +30,8 @@ img {
     animation-name: fadeIn, tilt;
     transition: all 0.3s ease-out;
 }
-img:hover {
+
+img.tilt:hover {
     transform: rotate(5deg);
 }
 
@@ -118,9 +122,9 @@ table td:first-child {
 .chart table th {
     border-top: dotted #CCC 1px;
 }
-table th:first-child {
+/* table th:first-child {
     width: 280px !important;
-}
+} */
 
 table td p {
     margin-top: 0px;

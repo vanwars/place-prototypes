@@ -39,13 +39,13 @@ const generateTable = (data, columns, groupBy) => {
     let html = `<table class="draggable">
             <thead>
                 <tr>
-                    <th class="no-drag" style="min-width: 150px;">
+                    <th class="no-drag">
                         <select id="tag-selection">
-                            <option value="id">Individuals</option>
-                            <option value="location.city">City</option>
-                            <option value="location.state">State</option>
-                            <option value="location.country">Country</option>
-                            <option value="tags">Tags</option>
+                            <option value="id">No Grouping</option>
+                            <option value="location.city">Group by City</option>
+                            <option value="location.state">Group by State</option>
+                            <option value="location.country">Group by Country</option>
+                            <option value="tags">Group by Tag</option>
                         </select>
                     </th>
                     ${ths}
@@ -97,7 +97,13 @@ const toCommaDelimitedList = (data) => {
 const toHTMLImages = (imageURLs) => {
     return imageURLs.map((item, i) => {
         const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
-        return `<img style="animation-delay: ${delay}" src="${item}" />`;
+        return `<img class="tilt" style="animation-delay: ${delay}" src="${item}" />`;
+    }).join('');
+};
+
+const toHTMLImagesLarge = (imageURLs) => {
+    return imageURLs.map(item => {
+        return `<img style="height:auto;width:300px;" src="${item}" />`;
     }).join('');
 };
 
@@ -206,7 +212,8 @@ const renderData = () => {
     const container = document.querySelector('main');
     const tagName = groupBy.split('.')[groupBy.split('.').length - 1];
 
-    const columns = [
+    let columns = [
+        { name: 'count', type: 'count', width: 180, title: 'Count', formatter: String },
         { name: 'image_source', type: 'image', width: 500, title: 'Map Image', formatter: toHTMLImages }, 
         { name: 'tags', type: 'list', width: 340, title: 'Tags', formatter: toTagList }, 
         { name: 'id', type: 'int', title: 'ID', width: 200, formatter: toCommaDelimitedList }, 
@@ -215,13 +222,19 @@ const renderData = () => {
         { name: 'location.city', type: 'text', title: 'City', width: 340, formatter: toHTMLList }, 
         { name: 'author', type: 'text', width: 340, title: 'Author', formatter: toHTMLList }
     ]
-    if (groupBy != "id") {
-        columns.unshift({ name: 'count', type: 'count', width: 180, title: 'Count', formatter: String }) 
+    if (groupBy === "id") {
+        columns = [
+            { name: 'id', type: 'int', title: 'ID', width: 40, formatter: toCommaDelimitedList }, 
+            { name: 'image_source', type: 'image', width: 310, title: 'Map Image', formatter: toHTMLImagesLarge }, 
+            { name: 'header', type: 'type', width: 240, title: 'Title', formatter: String },
+            { name: 'paragraphs', type: 'list', width: 340, title: 'Description', formatter: toParagraphs },
+            { name: 'tags', type: 'list', width: 240, title: 'Tags', formatter: toTagList }, 
+            { name: 'location.country', type: 'text', title: 'Country', width: 140, formatter: String }, 
+            { name: 'location.state', type: 'text', title: 'State', width: 140, formatter: String }, 
+            { name: 'location.city', type: 'text', title: 'City', width: 140, formatter: String }, 
+            { name: 'author', type: 'text', width: 140, title: 'Author', formatter: String }
+        ];
     } 
-    else {
-        columns.push({ name: 'header', type: 'type', width: 340, title: 'Title', formatter: String });
-        columns.push({ name: 'paragraphs', type: 'list', width: 540, title: 'Description', formatter: toParagraphs });
-    }
     const dataDictionary = collapseBy(groupBy, visibleMapData, columns);
     const matrix = toSortedMatrix(groupBy, dataDictionary, columns, 'count')
     const searchTerm = document.querySelector('#search-bar').value;
