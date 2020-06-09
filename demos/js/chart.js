@@ -28,15 +28,12 @@ const flattenObject = (ob) => {
 const generateTable = (data, columns, groupBy) => {
     let ths = '';
     for (const column of columns) {
-        let title = column.title;
-        if (column.name === 'count') {
-            let features = groupBy.split('.');
-            let feature = features[features.length - 1].replace('tags', 'tag');
-            title = '# of Entries by ' + feature[0].toUpperCase() + feature.slice(1);
+        if (column.name !== 'count') {
+            ths += `<th style="min-width:${column.width || 100}px;">${column.title}</th>`
         }
-        ths += `<th style="min-width:${column.width || 100}px;">${title}</th>`
     }
-    let html = `<table class="draggable">
+    let html = `
+        <table class="draggable">
             <thead>
                 <tr>
                     <th class="no-drag">
@@ -51,17 +48,30 @@ const generateTable = (data, columns, groupBy) => {
                     ${ths}
                 </tr>
             </thead>
-            <tbody>`;
-    const header = data.shift();
+            <tbody>
+        `;
+    
+    // drop header column:
+    data.shift();
+
+    // then generate cells:
     for (row of data) {
         html += `<tr>`
         for (let i = 0; i < row.length; i++) {
             const cell = row[i];
-            if (i > 0) {
-                const formatter = columns[i-1].formatter;
-                html += `<td>${formatter(cell)}</td>`;
+            if (i === 0) {
+                if (groupBy !== 'id') {
+                    const count = row[i + 1];
+                    html += `<td>${cell}: <span>${count}</span> </td>`;
+                } else {
+                    html += `<td>${cell}</td>`;
+                }
             } else {
-                html += `<td>${cell}</td>`;
+                const column = columns[i-1];
+                if (column.name !== 'count') {
+                    const formatter = column.formatter;
+                    html += `<td>${formatter(cell)}</td>`;
+                }
             }
         }
         html += `</tr>`;
@@ -85,7 +95,7 @@ const setOption = (selectElement, value) => {
 
 const getUniqueValues = (data) => {
     return data.filter((value, index, self) => {
-        return self.indexOf(value) === index && value !== 'Unknown';
+        return self.indexOf(value) === index && value !== 'Not specified';
     });
 }
 
@@ -144,7 +154,7 @@ const updateEntry = (entry, row, columns, groupBy) => {
         } else if (column.type === 'list') {
             entry[column.name] = entry[column.name].concat(row[column.name])
         } else {
-            entry[column.name].push(row[column.name] || 'Unknown')
+            entry[column.name].push(row[column.name] || 'Not specified')
         }
     }
 }
@@ -169,19 +179,20 @@ const collapseByTag = (visibleData, columns) => {
 };
 
 const collapseBy = (groupBy, visibleData, columns) => {
+    let data = {};
     if (groupBy === 'tags') {
-        return collapseByTag(visibleData, columns);
+        data = collapseByTag(visibleData, columns);
     } else {
-        data = {}
         for (const row of visibleData) {
-            const key = row[groupBy] || 'Unknown';
+            const key = row[groupBy] || 'Not specified';
             if (!data[key]) {
                 data[key]= {};
             }
             updateEntry(data[key], row, columns, groupBy);
         }
-        return data;  
     }
+    return data;  
+
 };
 
 const toSortedMatrix = (groupBy, visibleMapData, columns, sortBy) => {
