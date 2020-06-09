@@ -1,4 +1,5 @@
 let mapData;
+const noData = 'Not specified';
 const url = "../results/data.json";
 
 const saveData = (data) => {
@@ -95,7 +96,7 @@ const setOption = (selectElement, value) => {
 
 const getUniqueValues = (data) => {
     return data.filter((value, index, self) => {
-        return self.indexOf(value) === index && value !== 'Not specified';
+        return self.indexOf(value) === index && value !== noData;
     });
 }
 
@@ -105,10 +106,12 @@ const toCommaDelimitedList = (data) => {
 };
 
 const toHTMLImages = (imageURLs) => {
-    return imageURLs.map((item, i) => {
-        const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
-        return `<img class="tilt" style="animation-delay: ${delay}" src="${item}" />`;
-    }).join('');
+    return imageURLs
+        .filter(item => item !== noData)
+        .map((item, i) => {
+            const delay = (0.5 + i * 0.1).toFixed(2) + 's;';
+            return `<img class="tilt" style="animation-delay: ${delay}" src="${item}" />`;
+        }).join('');
 };
 
 const toHTMLImagesLarge = (imageURLs) => {
@@ -154,7 +157,7 @@ const updateEntry = (entry, row, columns, groupBy) => {
         } else if (column.type === 'list') {
             entry[column.name] = entry[column.name].concat(row[column.name])
         } else {
-            entry[column.name].push(row[column.name] || 'Not specified')
+            entry[column.name].push(row[column.name] || noData)
         }
     }
 }
@@ -184,7 +187,7 @@ const collapseBy = (groupBy, visibleData, columns) => {
         data = collapseByTag(visibleData, columns);
     } else {
         for (const row of visibleData) {
-            const key = row[groupBy] || 'Not specified';
+            const key = row[groupBy] || noData;
             if (!data[key]) {
                 data[key]= {};
             }
