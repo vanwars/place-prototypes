@@ -2,6 +2,10 @@ let numColumns = 4;
 let mapData;
 let mapMarkers = [];
 let map;
+let oms;
+const popup = new L.Popup({
+    offset: [0, -30]
+});
 const url = "../results/data.json";
 
 const saveData = (data) => {
@@ -23,6 +27,29 @@ const drawMap = () => {
             minZoom: 2,
             maxZoom: 14
         }).setView([51.505, -0.09], 2);
+
+        // Add marker clustering control: 
+        oms = new OverlappingMarkerSpiderfier(map);
+        oms.addListener('click', marker => {
+            const item = marker.item;
+            const latLng = marker.getLatLng();
+            setTimeout(() => { 
+                map.invalidateSize()
+                map.setView(latLng); 
+            }, 10);
+
+            // Card right-hand side:
+            document.querySelector('main').classList.add('with-card');
+            document.querySelector('#card-holder').innerHTML = generateCard(item);
+            document.querySelector('.more').onclick = toggleFullScreen;
+            document.querySelector('.less').onclick = toggleFullScreen;
+
+            // popup
+            popup.setContent(item.place);
+            popup.setLatLng(latLng);
+            map.openPopup(popup);
+        });
+
 };
 
 const renderData = () => {
@@ -40,19 +67,18 @@ const renderData = () => {
     for (const item of visibleMapData) {
         const lat = parseFloat(item.location.geometry.lat);
         const lng = parseFloat(item.location.geometry.lng);
+        // const icon = L.divIcon({ popupAnchor: [0, 30] });
+        // const icon = L.Icon.Default.extend({ 
+        //     options: { 
+        //         popupAnchor: [0, 30], 
+        //         iconUrl: L.Icon.Default.imagePath + '/marker-desat.png'
+        //     } 
+        // });
+        // item.icon = icon;
         const marker = L.marker([lat, lng], item).addTo(map);
-        marker.on('click', function(e) {
-            setTimeout(() => { 
-                map.invalidateSize()
-                map.setView(e.latlng); 
-            }, 10);
-            document.querySelector('main').classList.add('with-card');
-            document.querySelector('#card-holder').innerHTML = generateCard(item);
-            document.querySelector('.more').onclick = toggleFullScreen;
-            document.querySelector('.less').onclick = toggleFullScreen;
-        });
+        marker.item = item;
         mapMarkers.push(marker);
-        marker.bindPopup(item.place);
+        oms.addMarker(marker);
     }
 }
 
