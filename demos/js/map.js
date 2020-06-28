@@ -41,8 +41,9 @@ const drawMap = () => {
             // Card right-hand side:
             document.querySelector('main').classList.add('with-card');
             document.querySelector('#card-holder').innerHTML = generateCard(item);
-            document.querySelector('.more').onclick = toggleFullScreen;
-            document.querySelector('.less').onclick = toggleFullScreen;
+            document.querySelector('.mobile .more').onclick = showFullscreen;
+            document.querySelector('.mobile h2').onclick = showFullscreen;
+            document.querySelector('.less').onclick = minimize;
 
             // popup
             popup.setContent(item.place);
@@ -92,9 +93,17 @@ const init = () => {
         .then(renderData)
 };
 
-const toggleFullScreen = () => {
-    document.querySelector('#card-holder').classList.toggle('fullscreen');
+// const toggleFullScreen = () => {
+//     document.querySelector('#card-holder').classList.toggle('fullscreen');
+//     map.invalidateSize();
+// }
+const showFullscreen = () => {
+    document.querySelector('#card-holder').classList.add('fullscreen');
     map.invalidateSize();
-}
+};
+const minimize = () => {
+    document.querySelector('#card-holder').classList.remove('fullscreen');
+    map.invalidateSize();
+};
 
 init();
